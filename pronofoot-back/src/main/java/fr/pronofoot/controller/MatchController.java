@@ -2,6 +2,7 @@ package fr.pronofoot.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +12,7 @@ import fr.pronofoot.service.MatchService;
 
 @RestController
 @RequestMapping("/api/matches")
+@CrossOrigin(origins = "*")
 public class MatchController {
     @Autowired
     private MatchService matchService;

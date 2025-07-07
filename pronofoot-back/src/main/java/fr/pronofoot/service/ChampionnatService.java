@@ -1,5 +1,6 @@
 package fr.pronofoot.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -96,9 +97,9 @@ public class ChampionnatService {
                 .collect(Collectors.toList());
     }
 
-    public List<String> getEquipesParChampionnatEtSaison(String codeChampionnat, String anneeSaison) {
+    public List<Equipe> getEquipesParChampionnatEtSaison(String codeChampionnat, String anneeSaison) {
         Optional<Championnat> championnatOpt = championnatRepository.findByCode(codeChampionnat);
-        Optional<Saison> saisonOpt = saisonRepository.findByAnnee(anneeSaison);
+        Optional<Saison>       saisonOpt       = saisonRepository.findByAnnee(anneeSaison);
         if (championnatOpt.isEmpty() || saisonOpt.isEmpty()) return List.of();
 
         Optional<ChampionnatSaison> csOpt = championnatSaisonRepository
@@ -107,8 +108,9 @@ public class ChampionnatService {
         if (csOpt.isEmpty()) return List.of();
 
         return participationRepository.findByChampionnatSaison(csOpt.get()).stream()
-                .map(p -> p.getEquipe().getNom())
-                .sorted()
+                .map(Participation::getEquipe)
+                .sorted(Comparator.comparing(Equipe::getNom))
                 .collect(Collectors.toList());
     }
+
 }

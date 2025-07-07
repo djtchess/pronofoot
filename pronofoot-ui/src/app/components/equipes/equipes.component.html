@@ -1,0 +1,10 @@
+<div class="equipes-container" *ngIf="equipes$ | async as equipes">
+  <h2 class="equipes-title">Équipes {{ code }} - Saison {{ annee }}</h2>
+  <ul class="equipes-list">
+    <li *ngFor="let equipe of equipes">
+      {{ equipe.nom }}
+    </li>
+  </ul>
+
+  <a [routerLink]="['/championnats']">← Retour aux championnats</a>
+</div>

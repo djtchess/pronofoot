@@ -1,0 +1,18 @@
+.championnats-container {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.championnat-card {
+  @apply bg-white rounded-2xl p-4 shadow;
+}
+
+.championnat-title {
+  @apply text-xl font-semibold mb-2;
+}
+
+.saisons-list {
+  @apply list-disc pl-5;
+}

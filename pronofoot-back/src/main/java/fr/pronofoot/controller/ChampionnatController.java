@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,10 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.pronofoot.dto.ChampionnatDto;
 import fr.pronofoot.dto.ChampionnatSaisonDto;
+import fr.pronofoot.dto.record.EquipeDto;
 import fr.pronofoot.service.ChampionnatService;
 
 @RestController
 @RequestMapping("/api/championnats")
+@CrossOrigin(origins = "*")
 public class ChampionnatController {
 
     @Autowired private ChampionnatService championnatService;
@@ -49,7 +52,15 @@ public class ChampionnatController {
 
     // 🧑‍🤝‍🧑 Liste les équipes pour un championnat et une saison
     @GetMapping("/{code}/saisons/{annee}/equipes")
-    public ResponseEntity<List<String>> getEquipesPourChampionnatEtSaison(@PathVariable String code, @PathVariable String annee) {
-        return ResponseEntity.ok(championnatService.getEquipesParChampionnatEtSaison(code, annee));
+    public ResponseEntity<List<EquipeDto>> getEquipesPourChampionnatEtSaison(
+            @PathVariable String code,
+            @PathVariable String annee) {
+
+        List<EquipeDto> equipes = championnatService.getEquipesParChampionnatEtSaison(code, annee).stream()
+                .map(e -> new EquipeDto(e.getId(), e.getNom()))
+                .toList();
+
+        return ResponseEntity.ok(equipes);
     }
+
 }
