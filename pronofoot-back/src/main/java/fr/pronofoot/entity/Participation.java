@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 public class Participation {
 
     @Id
-    @SequenceGenerator(name = "match_seq", sequenceName = "match_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "match_seq")
+    @SequenceGenerator(name = "participation_seq", sequenceName = "participation_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "participation_seq")
     private Long id;
 
     @ManyToOne
