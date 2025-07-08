@@ -1,0 +1,54 @@
+<div class="matchs-container">
+  <!-- Sélection du championnat -->
+  <label for="champ">Championnat :</label>
+  <select id="champ"
+          [(ngModel)]="selectedCode"
+          (change)="onSelectChampionnat()">
+
+    <option [ngValue]="null">-- Sélectionner --</option>
+
+    <!-- ⛔  (async ?? [])  -->
+    <!-- ✅  (async) || [] -->
+    <option *ngFor="let c of (championnats$ | async) || []"
+            [ngValue]="c.code">
+      {{ c.nom }} ({{ c.code }})
+    </option>
+  </select>
+
+  <button (click)="updateScoresBeforeToday()"
+          [disabled]="!selectedCode">
+    Mettre à jour scores des journées passées
+  </button>
+
+  <!-- Groupes par journée -->
+  <ng-container *ngIf="data$ | async as groups">
+    <div *ngFor="let g of groups" class="journee-card">
+      <h3>Journée {{ g.journee }}</h3>
+
+      <button (click)="updateScoresJournee(g.journee)">
+        Maj scores de cette journée
+      </button>
+
+      <table class="matchs-table">
+        <thead>
+          <tr>
+            <th>Domicile</th>
+            <th></th>
+            <th>Extérieur</th>
+            <th>Date</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of g.matchs">
+            <td>{{ m.equipeDomicile.nom }}</td>
+            <td>-</td>
+            <td>{{ m.equipeExterieure.nom }}</td>
+            <td>{{ m.date | date : 'shortDate' }}</td>
+            <td>{{ m.scoreDomicile }} - {{ m.scoreExterieur }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+</div>

@@ -1,18 +1,84 @@
+/* -----------------------------------------------------------
+   championnats.component.scss — Dark modern style
+   ----------------------------------------------------------- */
+
+/* ---------- Color palette ---------- */
+$bg-dark:          #121212;   // fond principal
+$card-dark:        #1e1e1e;   // cartes
+$accent-1:         #00adb5;   // turquoise
+$accent-2:         #ff9f1c;   // orange
+$text-light:       #e0e0e0;
+
+/* ---------- Layout container ---------- */
 .championnats-container {
   display: grid;
-  gap: 1rem;
-  padding: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  background: $bg-dark;
+  min-height: 100vh;
 }
 
+/* ---------- Card ---------- */
 .championnat-card {
-  @apply bg-white rounded-2xl p-4 shadow;
+  background: $card-dark;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+  }
 }
 
+/* ---------- Title ---------- */
 .championnat-title {
-  @apply text-xl font-semibold mb-2;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: $accent-1;
+  margin-bottom: 0.75rem;
 }
 
+/* ---------- Seasons list ---------- */
 .saisons-list {
-  @apply list-disc pl-5;
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  li a {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $text-light;
+    text-decoration: none;
+    background: mix($accent-2, $card-dark, 25%);   // subtil orange
+    transition: background 0.25s;
+
+    &:hover {
+      background: $accent-2;
+    }
+  }
+}
+
+/* ---------- Scrollbar (desktop) ---------- */
+@media (hover: hover) {
+  ::-webkit-scrollbar {
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
 }

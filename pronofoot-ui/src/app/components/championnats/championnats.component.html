@@ -1,12 +1,15 @@
 <div class="championnats-container" *ngIf="data$ | async as items">
-  <div class="championnat-card" *ngFor="let item of items">
+  <a class="championnat-card"
+     *ngFor="let item of items"
+     [routerLink]="['/championnats', item.championnat.code]">
     <h2 class="championnat-title">{{ item.championnat.nom }} ({{ item.championnat.code }})</h2>
     <ul class="saisons-list">
       <li *ngFor="let saison of item.saisons">
-        <a [routerLink]="['/championnats', item.championnat.code, 'saisons', saison, 'equipes']">
+        <a [routerLink]="['/championnats', item.championnat.code, 'saisons', saison, 'equipes']"
+           (click)="$event.stopPropagation()">
           {{ saison }}
         </a>
       </li>
     </ul>
-  </div>
+  </a>
 </div>

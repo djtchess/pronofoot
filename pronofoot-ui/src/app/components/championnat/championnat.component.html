@@ -1,0 +1,7 @@
+<div class="championnat-container" *ngIf="championnat$ | async as champ">
+  <h1 class="championnat-title">{{ champ.nom }} ({{ champ.code }})</h1>
+
+  <!-- Contenu à compléter plus tard -->
+
+  <a class="back-link" [routerLink]="['/championnats']">← Retour à la liste des championnats</a>
+</div>

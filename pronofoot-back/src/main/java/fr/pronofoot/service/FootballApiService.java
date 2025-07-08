@@ -16,8 +16,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.pronofoot.dto.ChampionnatDto;
 import fr.pronofoot.dto.CompetitionApiResponse;
 import fr.pronofoot.dto.CompetitionItem;
-import fr.pronofoot.dto.TeamItem;
 import fr.pronofoot.dto.MatchDto;
+import fr.pronofoot.dto.SaisonDto;
+import fr.pronofoot.dto.TeamItem;
 import fr.pronofoot.dto.TeamsApiResponse;
 import reactor.core.publisher.Mono;
 
@@ -74,6 +75,36 @@ public class FootballApiService {
                 .block();
     }
 
+    public ChampionnatDto getCompetitionInfo(String codeChampionnat) {
+        JsonNode root = webClient.get()
+                .uri("/competitions/{code}", codeChampionnat)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .block();
+
+        if (root == null || root.path("competition").isMissingNode()) {
+            throw new RuntimeException("Données manquantes pour le championnat " + codeChampionnat);
+        }
+
+        ChampionnatDto dto = new ChampionnatDto();
+        dto.setCode(root.path("code").asText());
+        dto.setNom(root.path("name").asText());
+        dto.setPays(root.path("area").path("name").asText());
+
+        JsonNode currentSeasonNode = root.path("currentSeason");
+        if (!currentSeasonNode.isMissingNode()) {
+            SaisonDto saisonDto = new SaisonDto();
+            saisonDto.setId(currentSeasonNode.path("id").asLong());
+            saisonDto.setStartDate(currentSeasonNode.path("startDate").asText());
+            saisonDto.setEndDate(currentSeasonNode.path("endDate").asText());
+            saisonDto.setYear(currentSeasonNode.path("year").asInt());
+            dto.setCurrentSeason(saisonDto);
+        }
+
+        return dto;
+    }
+
+
     public ChampionnatDto getChampionnatAvecEquipes(String code) {
         return webClient.get()
                 .uri("/competitions/{code}/teams", code)
@@ -123,5 +154,7 @@ public class FootballApiService {
             return Set.of();
         }
     }
+
+
 }
 

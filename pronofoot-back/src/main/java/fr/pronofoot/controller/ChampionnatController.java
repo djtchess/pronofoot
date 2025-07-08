@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.pronofoot.dto.ChampionnatDto;
 import fr.pronofoot.dto.ChampionnatSaisonDto;
 import fr.pronofoot.dto.record.EquipeDto;
 import fr.pronofoot.service.ChampionnatService;
+import fr.pronofoot.service.FootballApiService;
 
 @RestController
 @RequestMapping("/api/championnats")
@@ -23,6 +25,8 @@ import fr.pronofoot.service.ChampionnatService;
 public class ChampionnatController {
 
     @Autowired private ChampionnatService championnatService;
+
+    @Autowired private FootballApiService footballApiService;
 
     // 🔄 Synchronise tous les championnats depuis l'API
     @PostMapping("/sync")
@@ -50,6 +54,19 @@ public class ChampionnatController {
         return ResponseEntity.ok(championnatService.getSaisonsPourChampionnat(code));
     }
 
+    @GetMapping("/{code}")
+    public ResponseEntity<ChampionnatDto> getChampionnat(@PathVariable String code, @RequestParam(defaultValue = "false") boolean sync) {
+        ChampionnatDto dto = sync
+                ? championnatService.synchronizeAndReturnChampionnat(code)
+                : championnatService.getChampionnatFromDb(code);
+
+        if (dto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(dto);
+    }
+
     // 🧑‍🤝‍🧑 Liste les équipes pour un championnat et une saison
     @GetMapping("/{code}/saisons/{annee}/equipes")
     public ResponseEntity<List<EquipeDto>> getEquipesPourChampionnatEtSaison(
@@ -61,6 +78,13 @@ public class ChampionnatController {
                 .toList();
 
         return ResponseEntity.ok(equipes);
+    }
+
+
+    @GetMapping("/{code}/current-season")
+    public ResponseEntity<Integer> getCurrentSeasonYear(@PathVariable String code) {
+        int seasonYear = footballApiService.getCurrentSeasonYear(code);
+        return ResponseEntity.ok(seasonYear);
     }
 
 }

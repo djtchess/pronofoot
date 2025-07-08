@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import fr.pronofoot.dto.ChampionnatDto;
 import fr.pronofoot.dto.ChampionnatSaisonDto;
 import fr.pronofoot.dto.CompetitionItem;
+import fr.pronofoot.dto.SaisonDto;
 import fr.pronofoot.entity.Championnat;
 import fr.pronofoot.entity.ChampionnatSaison;
 import fr.pronofoot.entity.Equipe;
@@ -22,6 +23,7 @@ import fr.pronofoot.repository.ChampionnatSaisonRepository;
 import fr.pronofoot.repository.EquipeRepository;
 import fr.pronofoot.repository.ParticipationRepository;
 import fr.pronofoot.repository.SaisonRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ChampionnatService {
@@ -82,8 +84,62 @@ public class ChampionnatService {
 
     public List<ChampionnatDto> getAllChampionnats() {
         return championnatRepository.findAll().stream()
-                .map(c -> new ChampionnatDto(c.getCode(), c.getNom()))
+                .map(c -> new ChampionnatDto(c.getCode(), c.getNom(), null, null, null))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Récupère un championnat par son code et le transforme en DTO.
+     * @throws EntityNotFoundException si le code n'existe pas.
+     */
+    public ChampionnatDto getChampionnat(String code) {
+        return championnatRepository.findByCode(code)
+                .map(c -> new ChampionnatDto(c.getCode(), c.getNom(), null, null, null))
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Championnat non trouvé : " + code));
+    }
+
+    public ChampionnatDto synchronizeAndReturnChampionnat(String code) {
+        ChampionnatDto apiDto = footballApiService.getCompetitionInfo(code);
+        Championnat championnat = championnatRepository.findByCode(code)
+                .orElseGet(() -> new Championnat());
+
+        championnat.setCode(apiDto.getCode());
+        championnat.setNom(apiDto.getNom());
+        championnatRepository.save(championnat);
+
+        return apiDto;
+    }
+
+    public ChampionnatDto getChampionnatFromDb(String code) {
+        return championnatRepository.findByCode(code)
+                .map(championnat -> {
+                    ChampionnatDto dto = new ChampionnatDto();
+                    dto.setCode(championnat.getCode());
+                    dto.setNom(championnat.getNom());
+
+                    // Extraction du pays (si tu le stockes dans une future version de l'entité)
+                    dto.setPays(null); // à adapter si le champ est en base
+
+                    if (championnat.getSaisons() != null && !championnat.getSaisons().isEmpty()) {
+                        // Prendre la saison la plus récente (max année)
+                        ChampionnatSaison derniereSaison = championnat.getSaisons().stream()
+                                .max((a, b) -> a.getSaison().getAnnee().compareTo(b.getSaison().getAnnee()))
+                                .orElse(null);
+
+                        if (derniereSaison != null) {
+                            SaisonDto saisonDto = new SaisonDto();
+                            saisonDto.setId(derniereSaison.getSaison().getId());
+                            saisonDto.setYear(Integer.valueOf(derniereSaison.getSaison().getAnnee()));
+                            // Les dates ne sont pas dans ta BDD actuelle, donc null
+                            saisonDto.setStartDate(null);
+                            saisonDto.setEndDate(null);
+                            dto.setCurrentSeason(saisonDto);
+                        }
+                    }
+                    return dto;
+                })
+                .orElse(null);
     }
 
     public List<String> getSaisonsPourChampionnat(String codeChampionnat) {

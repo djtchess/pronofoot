@@ -1,15 +1,77 @@
+/* -----------------------------------------------------------
+   equipes.component.scss — Dark modern style
+   ----------------------------------------------------------- */
+
+/* ---------- Palette (mêmes teintes que championnats) ---------- */
+$bg-dark:          #121212;
+$panel-dark:       #1e1e1e;
+$accent-1:         #00adb5;   // turquoise
+$accent-2:         #ff9f1c;   // orange
+$text-light:       #e0e0e0;
+
+/* ---------- Wrapper ---------- */
 .equipes-container {
-  padding: 1rem;
+  background: $bg-dark;
+  min-height: 100vh;
+  padding: 2rem 1.5rem;
 }
 
+/* ---------- Title ---------- */
 .equipes-title {
-  font-size: 1.25rem;
+  color: $accent-1;
+  font-size: 1.4rem;
   font-weight: 600;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 
+/* ---------- List ---------- */
 .equipes-list {
-  list-style-type: disc;
-  padding-left: 1.25rem;
-  margin-bottom: 1rem;
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.equipes-list li {
+  background: $panel-dark;
+  color: $text-light;
+  padding: 0.7rem 1rem;
+  border-radius: 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* ---------- Back link ---------- */
+a[routerLink] {
+  display: inline-block;
+  margin-top: 2rem;
+  color: $accent-2;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.25s ease;
+
+  &:hover {
+    color: lighten($accent-2, 10%);
+  }
+}
+
+/* Lien “Retour” — blanc dans tous les états */
+.back-link,
+.back-link:visited,
+.back-link:focus,
+.back-link:hover {
+  color: #ffffff;          /* blanc */
+  text-decoration: none;   /* pas de soulignement */
+}
+
+.back-link:hover {
+  color: #cccccc;          /* gris clair au survol */
 }
