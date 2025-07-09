@@ -1,7 +1,13 @@
-<div class="championnat-container" *ngIf="championnat$ | async as champ">
-  <h1 class="championnat-title">{{ champ.nom }} ({{ champ.code }})</h1>
+<div *ngIf="championnat$ | async as championnat">
+  <h2>{{ championnat.nom }} ({{ championnat.code }})</h2>
+  <p>Pays : {{ championnat.pays }}</p>
 
-  <!-- Contenu à compléter plus tard -->
+  <h4>Saison actuelle</h4>
+  <ul>
+    <li>Année : {{ championnat.currentSeason.year }}</li>
+    <li>Début : {{ championnat.currentSeason.startDate }}</li>
+    <li>Fin : {{ championnat.currentSeason.endDate }}</li>
+  </ul>
 
-  <a class="back-link" [routerLink]="['/championnats']">← Retour à la liste des championnats</a>
+  <button (click)="onSync()">🔄 Synchroniser avec l'API</button>
 </div>

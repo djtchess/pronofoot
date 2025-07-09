@@ -26,7 +26,12 @@ export class ChampionnatService {
   /**
    * Récupère le détail d'un championnat par son code.
    */
-  getChampionnat(code: string): Observable<Championnat> {
-    return this.http.get<Championnat>(`${this.baseUrl}/${code}`);
+  // getChampionnat(code: string): Observable<Championnat> {
+  //   return this.http.get<Championnat>(`${this.baseUrl}/${code}`);
+  // }
+
+  getChampionnat(code: string, sync: boolean = false): Observable<Championnat> {
+    const params = { sync: sync.toString() };
+    return this.http.get<Championnat>(`${this.baseUrl}/${code}`, { params });
   }
 }

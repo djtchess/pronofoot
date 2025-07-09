@@ -1,15 +1,13 @@
 package fr.pronofoot.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 
@@ -17,11 +15,11 @@ import jakarta.persistence.Table;
 @Table(name = "saison")
 public class Saison {
     @Id
-    @SequenceGenerator(name = "saison_seq", sequenceName = "saison_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "saison_seq")
     private Long id;
 
-    private String annee; // Exemple : "2024-2025"
+    private String annee;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     @OneToMany(mappedBy = "saison", cascade = CascadeType.ALL)
     private List<ChampionnatSaison> championnats = new ArrayList<>();
@@ -29,9 +27,11 @@ public class Saison {
     public Saison() {
     }
 
-    public Saison(Long id, String annee, List<ChampionnatSaison> championnats) {
+    public Saison(Long id, String annee, LocalDate startDate, LocalDate endDate, List<ChampionnatSaison> championnats) {
         this.id = id;
         this.annee = annee;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.championnats = championnats;
     }
 
@@ -53,6 +53,22 @@ public class Saison {
 
     public void setAnnee(String annee) {
         this.annee = annee;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public List<ChampionnatSaison> getChampionnats() {

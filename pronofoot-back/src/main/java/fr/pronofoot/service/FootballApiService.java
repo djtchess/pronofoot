@@ -1,5 +1,6 @@
 package fr.pronofoot.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -75,34 +76,54 @@ public class FootballApiService {
                 .block();
     }
 
-    public ChampionnatDto getCompetitionInfo(String codeChampionnat) {
-        JsonNode root = webClient.get()
+    public ChampionnatDto getChampionnatDetails(String codeChampionnat) {
+        JsonNode node = webClient.get()
                 .uri("/competitions/{code}", codeChampionnat)
                 .retrieve()
+                .onStatus(
+                        res -> res.isError(),
+                        res -> res.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new RuntimeException("API error: " + res.statusCode() + " - " + body)))
+                )
                 .bodyToMono(JsonNode.class)
                 .block();
 
-        if (root == null || root.path("competition").isMissingNode()) {
-            throw new RuntimeException("Données manquantes pour le championnat " + codeChampionnat);
+        if (node == null) {
+            throw new RuntimeException("Aucune donnée trouvée pour le championnat " + codeChampionnat);
         }
 
         ChampionnatDto dto = new ChampionnatDto();
-        dto.setCode(root.path("code").asText());
-        dto.setNom(root.path("name").asText());
-        dto.setPays(root.path("area").path("name").asText());
+        dto.setCode(node.path("code").asText());
+        dto.setNom(node.path("name").asText());
 
-        JsonNode currentSeasonNode = root.path("currentSeason");
-        if (!currentSeasonNode.isMissingNode()) {
-            SaisonDto saisonDto = new SaisonDto();
-            saisonDto.setId(currentSeasonNode.path("id").asLong());
-            saisonDto.setStartDate(currentSeasonNode.path("startDate").asText());
-            saisonDto.setEndDate(currentSeasonNode.path("endDate").asText());
-            saisonDto.setYear(currentSeasonNode.path("year").asInt());
-            dto.setCurrentSeason(saisonDto);
+        // Récupération de la saison courante
+        JsonNode currentSeason = node.path("currentSeason");
+        if (!currentSeason.isMissingNode()) {
+            SaisonDto saison = new SaisonDto();
+            saison.setId(currentSeason.get("id").asLong());
+            saison.setYear(currentSeason.path("startDate").asText().substring(0, 4)); // ou currentSeason.path("year").asText() si présent
+            saison.setStartDate(LocalDate.parse(currentSeason.path("startDate").asText()));
+            saison.setEndDate(LocalDate.parse(currentSeason.path("endDate").asText()));
+            dto.setCurrentSeason(saison);
         }
+
+        // Récupération de toutes les saisons (optionnel)
+//        JsonNode seasonsNode = node.path("seasons");
+//        if (seasonsNode.isArray()) {
+//            List<SaisonDto> saisons = new ArrayList<>();
+//            for (JsonNode s : seasonsNode) {
+//                SaisonDto saison = new SaisonDto();
+//                saison.setYear(s.path("startDate").asText().substring(0, 4));
+//                saison.setStartDate(LocalDate.parse(s.path("startDate").asText()));
+//                saison.setEndDate(LocalDate.parse(s.path("endDate").asText()));
+//                saisons.add(saison);
+//            }
+//            dto.set(saisons);
+//        }
 
         return dto;
     }
+
 
 
     public ChampionnatDto getChampionnatAvecEquipes(String code) {

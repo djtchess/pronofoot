@@ -100,16 +100,43 @@ public class ChampionnatService {
     }
 
     public ChampionnatDto synchronizeAndReturnChampionnat(String code) {
-        ChampionnatDto apiDto = footballApiService.getCompetitionInfo(code);
-        Championnat championnat = championnatRepository.findByCode(code)
-                .orElseGet(() -> new Championnat());
+        ChampionnatDto apiDto = footballApiService.getChampionnatDetails(code);
 
+        // 1. Sauvegarde ou récupération du championnat
+        Championnat championnat = championnatRepository.findByCode(code)
+                .orElseGet(Championnat::new);
         championnat.setCode(apiDto.getCode());
         championnat.setNom(apiDto.getNom());
-        championnatRepository.save(championnat);
+        championnat = championnatRepository.save(championnat);
+
+        // 2. Sauvegarde ou récupération de la saison courante
+        SaisonDto saisonDto = apiDto.getCurrentSeason();
+        Saison saison = saisonRepository.findById(saisonDto.getId())
+                .orElseGet(() -> {
+                    Saison s = new Saison();
+                    s.setId(saisonDto.getId());
+                    s.setAnnee(saisonDto.getYear());
+                    s.setStartDate(saisonDto.getStartDate());
+                    s.setEndDate(saisonDto.getEndDate());
+                    return saisonRepository.save(s); // important
+                });
+
+
+        // 3. Création du lien Championnat <-> Saison
+        boolean exists = championnatSaisonRepository
+                .findByChampionnatIdAndSaisonId(championnat.getId(), saison.getId())
+                .isPresent();
+
+        if (!exists) {
+            ChampionnatSaison cs = new ChampionnatSaison();
+            cs.setChampionnat(championnat);
+            cs.setSaison(saison);
+            championnatSaisonRepository.save(cs);
+        }
 
         return apiDto;
     }
+
 
     public ChampionnatDto getChampionnatFromDb(String code) {
         return championnatRepository.findByCode(code)
@@ -130,10 +157,9 @@ public class ChampionnatService {
                         if (derniereSaison != null) {
                             SaisonDto saisonDto = new SaisonDto();
                             saisonDto.setId(derniereSaison.getSaison().getId());
-                            saisonDto.setYear(Integer.valueOf(derniereSaison.getSaison().getAnnee()));
-                            // Les dates ne sont pas dans ta BDD actuelle, donc null
-                            saisonDto.setStartDate(null);
-                            saisonDto.setEndDate(null);
+                            saisonDto.setYear(derniereSaison.getSaison().getAnnee());
+                            saisonDto.setStartDate(derniereSaison.getSaison().getStartDate());
+                            saisonDto.setEndDate(derniereSaison.getSaison().getEndDate());
                             dto.setCurrentSeason(saisonDto);
                         }
                     }

@@ -81,10 +81,4 @@ public class ChampionnatController {
     }
 
 
-    @GetMapping("/{code}/current-season")
-    public ResponseEntity<Integer> getCurrentSeasonYear(@PathVariable String code) {
-        int seasonYear = footballApiService.getCurrentSeasonYear(code);
-        return ResponseEntity.ok(seasonYear);
-    }
-
 }

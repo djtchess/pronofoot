@@ -1,15 +1,17 @@
 package fr.pronofoot.dto;
 
+import java.time.LocalDate;
+
 public class SaisonDto {
     private Long id;
-    private String startDate;
-    private String endDate;
-    private Integer year;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String year;
 
     public SaisonDto() {
     }
 
-    public SaisonDto(Long id, String startDate, String endDate, Integer year) {
+    public SaisonDto(Long id, LocalDate startDate, LocalDate endDate, String year) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -24,27 +26,27 @@ public class SaisonDto {
         this.id = id;
     }
 
-    public String getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
-    public Integer getYear() {
+    public String getYear() {
         return year;
     }
 
-    public void setYear(Integer year) {
+    public void setYear(String year) {
         this.year = year;
     }
 }
