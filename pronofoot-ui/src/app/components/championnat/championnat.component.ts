@@ -1,10 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+// src/app/components/championnat/championnat.component.ts
+import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
-import { ChampionnatService } from '../../services/championnat.service';
-import { Championnat } from '../../models/championnat.model';
 import { AsyncPipe, NgIf } from '@angular/common';
-import { Observable, switchMap, BehaviorSubject, take } from 'rxjs';
+import { take, switchMap, BehaviorSubject, Observable } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';   
+
+
+import { ChampionnatService } from '../../services/championnat.service';
 import { MatchService } from '../../services/match.service';
+import { Championnat } from '../../models/championnat.model';
 
 @Component({
   standalone: true,
@@ -14,49 +18,70 @@ import { MatchService } from '../../services/match.service';
   imports: [NgIf, AsyncPipe, RouterLink, RouterOutlet]
 })
 export class ChampionnatComponent implements OnInit {
+  /** Flux du championnat (mise à jour via syncTrigger) */
   championnat$!: Observable<Championnat>;
-  private syncTrigger = new BehaviorSubject<boolean>(false);
-  private code!: string;
 
+  /** Déclencheur interne : `true` ⇒ forcer la synchro back-end puis reload */
+  private readonly syncTrigger = new BehaviorSubject<boolean>(false);
 
-  constructor(private route: ActivatedRoute, private championnatService: ChampionnatService, private matchService: MatchService) {}
+  /** Code du championnat dans l’URL (`:code`) */
+  private code = '';
 
+  /*— DI par inject() pour alléger le constructeur —*/
+  private readonly route = inject(ActivatedRoute);
+  private readonly championnatService = inject(ChampionnatService);
+  private readonly matchService = inject(MatchService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /* ------------------------------------------------------------------ */
+  /* cycle de vie                                                       */
+  /* ------------------------------------------------------------------ */
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.code = params['code'];
+    /* écoute du param :code */
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        this.code = params['code'];
 
-      // Initialiser championnat$ ici, une seule fois
-      this.championnat$ = this.syncTrigger.pipe(
-        switchMap(syncValue => this.championnatService.getChampionnat(this.code, syncValue))
-      );
+        /* initialisation (une seule fois) du flux championnat$ */
+        this.championnat$ = this.syncTrigger.pipe(
+          switchMap(sync =>
+            this.championnatService.getChampionnat(this.code, sync)
+          )
+        );
 
-      // Lancer un premier chargement
-      this.syncTrigger.next(false);
-    });
+        /* premier chargement (sans forcer la synchro back) */
+        this.syncTrigger.next(false);
+      });
   }
 
-  reloadChampionnat(sync: boolean): void {
-    this.syncTrigger.next(sync); // déclenche la requête
-  }
+  /* ------------------------------------------------------------------ */
+  /* méthodes publiques (visibles dans le template)                      */
+  /* ------------------------------------------------------------------ */
 
-  /** Bouton « Synchroniser avec l’API » */
+  /** Bouton « Synchroniser avec l’API » */
   onSync(): void {
-    // 1) récupérer l’année de la saison courante pour le paramètre `saison`
+    /* 1) récupérer la saison courante pour l’endpoint d’import */
     this.championnat$
-      .pipe(take(1))
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
       .subscribe(champ => {
         const saison = champ.currentSeason.year.toString();
 
-        // 2) appeler l’endpoint d’import
+        /* 2) appel back-end pour importer tous les matches */
         this.matchService.importMatches(this.code, saison).subscribe({
-          next: () => {
-            // 3) puis rafraîchir l’affichage en demandant une sync complète
-            this.reloadChampionnat(true);
-          },
-          error: err => console.error('Erreur lors de l’import des matchs :', err)
+          next: () => this.reloadChampionnat(true),   // 3) rafraîchit l’affichage
+          error: err =>
+            console.error('Erreur lors de l’import des matchs :', err)
         });
       });
   }
+
+  /* ------------------------------------------------------------------ */
+  /* helpers privés                                                     */
+  /* ------------------------------------------------------------------ */
+
+  /** Force le rechargement du championnat ; si `sync=true`, le back est interrogé */
+  private reloadChampionnat(sync: boolean): void {
+    this.syncTrigger.next(sync);
+  }
 }
-
-

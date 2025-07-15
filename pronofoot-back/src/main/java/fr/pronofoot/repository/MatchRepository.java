@@ -14,5 +14,12 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     List<Match> findByChampionnatSaisonId(Long championnatSaisonId);
 
     boolean existsByDateAndEquipeDomicileAndEquipeExterieur(LocalDate date, Equipe equipeDomicile, Equipe equipeExterieur);
+
+
+    /* pour toute la saison */
+    List<Match> findByChampionnatSaison_Championnat_CodeAndChampionnatSaison_Saison_AnneeOrderByDateAsc(String code, String annee);
+
+    /* pour une journée donnée */
+    List<Match> findByChampionnatSaison_Championnat_CodeAndChampionnatSaison_Saison_AnneeAndNumJourneeOrderByDateAsc(String code, String annee, int numJournee);
 }
 

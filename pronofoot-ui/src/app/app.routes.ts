@@ -33,6 +33,14 @@ export const routes: Routes = [
           import('./components/equipes/equipes.component')
             .then(m => m.EquipesComponent),
       },
+      {
+        path: 'journees/:saison',                // <- nouvelle route
+        loadComponent: () =>
+          import('./components/matchday/matchday.component')
+            .then(m => m.MatchdayComponent)
+      },
+
+      { path: '', redirectTo: 'journees/auto', pathMatch: 'full' }
     ],
   },
 

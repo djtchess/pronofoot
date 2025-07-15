@@ -25,6 +25,25 @@ export class MatchService {
     );
   }
 
+    /** Tous les matches d’un championnat et d’une saison */
+  getAllMatches(code: string, saison: string): Observable<Match[]> {
+    const params = new HttpParams().set('code', code).set('saison', saison);
+    return this.http.get<Match[]>(`${this.baseUrl}/all`, { params });
+  }
+
+  /** Matches d’une journée précise */
+  getMatchesByJournee(
+    code: string,
+    saison: string,
+    journee: number
+  ): Observable<Match[]> {
+    const params = new HttpParams()
+      .set('code', code)
+      .set('saison', saison)
+      .set('journee', journee);
+    return this.http.get<Match[]>(`${this.baseUrl}/byJournee`, { params });
+  }
+
   getMatchsByChampionnat(code: string, withoutScores = false): Observable<Match[]> {
     const url = withoutScores
       ? `${this.baseUrl}/championnat/${code}?sansScores=true`
@@ -43,4 +62,7 @@ export class MatchService {
   updateScoresBeforeToday(code: string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/championnat/${code}/updateScoresBeforeToday`, {});
   }
+
 }
+
+

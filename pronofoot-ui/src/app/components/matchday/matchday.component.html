@@ -1,0 +1,26 @@
+<div class="matchday-wrapper" *ngIf="matches$ | async as matches">
+  <label>
+    Journée&nbsp;
+    <select
+    [ngModel]="selectedJournee()"          
+    (ngModelChange)="onJourneeChange($event)"  
+    class="journee-select">
+    <option *ngFor="let j of matchdays" [value]="j">{{ j }}</option>
+    </select>
+
+  </label>
+
+  <ul class="match-list">
+    <li *ngFor="let m of matches" class="match-item">
+      <span class="date">
+        {{ m.date | date : 'dd/MM' }}
+      </span>
+      <span class="teams">
+        {{ m.equipeDomicile }} – {{ m.equipeExterieur }}
+      </span>
+      <span class="score" *ngIf="m.scoreDomicile !== null">
+        {{ m.scoreDomicile }}-{{ m.scoreExterieur }}
+      </span>
+    </li>
+  </ul>
+</div>
