@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.pronofoot.dto.ChampionnatDto;
-import fr.pronofoot.dto.ChampionnatSaisonDto;
+import fr.pronofoot.dto.SaisonDto;
 import fr.pronofoot.dto.record.EquipeDto;
 import fr.pronofoot.service.ChampionnatService;
 import fr.pronofoot.service.FootballApiService;
@@ -37,9 +37,9 @@ public class ChampionnatController {
 
     // ➕ Importe un championnat pour une saison avec ses équipes
     @PostMapping("/import")
-    public ResponseEntity<String> importChampionnatSaison(@RequestBody ChampionnatSaisonDto dto) {
+    public ResponseEntity<String> importChampionnatSaison(@RequestBody ChampionnatDto dto) {
         championnatService.saveChampionnatSaisonAvecEquipes(dto);
-        return ResponseEntity.ok("Championnat et équipes importés pour la saison " + dto.getAnneeSaison());
+        return ResponseEntity.ok("Championnat et équipes importés pour la saison " + dto.getCurrentSeason().getYear());
     }
 
     // 📋 Liste tous les championnats disponibles
@@ -50,7 +50,7 @@ public class ChampionnatController {
 
     // 📅 Récupère les saisons d’un championnat donné
     @GetMapping("/{code}/saisons")
-    public ResponseEntity<List<String>> getSaisonsPourChampionnat(@PathVariable String code) {
+    public ResponseEntity<List<SaisonDto>> getSaisonsPourChampionnat(@PathVariable String code) {
         return ResponseEntity.ok(championnatService.getSaisonsPourChampionnat(code));
     }
 
@@ -68,12 +68,12 @@ public class ChampionnatController {
     }
 
     // 🧑‍🤝‍🧑 Liste les équipes pour un championnat et une saison
-    @GetMapping("/{code}/saisons/{annee}/equipes")
+    @GetMapping("/{code}/saisons/{id}/equipes")
     public ResponseEntity<List<EquipeDto>> getEquipesPourChampionnatEtSaison(
             @PathVariable String code,
-            @PathVariable String annee) {
+            @PathVariable String id) {
 
-        List<EquipeDto> equipes = championnatService.getEquipesParChampionnatEtSaison(code, annee).stream()
+        List<EquipeDto> equipes = championnatService.getEquipesParChampionnatEtSaison(code, id).stream()
                 .map(e -> new EquipeDto(e.getId(), e.getNom()))
                 .toList();
 

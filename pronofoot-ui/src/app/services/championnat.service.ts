@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Championnat } from '../models/championnat.model';
 import { Equipe } from '../models/equipe.model';
+import { Saison } from '../models/saison.model';
 
 @Injectable({ providedIn: 'root' })
 export class ChampionnatService {
@@ -14,21 +15,13 @@ export class ChampionnatService {
     return this.http.get<Championnat[]>(`${this.baseUrl}`);
   }
 
-  getSaisons(code: string): Observable<string[]> {
-    return this.http.get<string[]>(`${this.baseUrl}/${code}/saisons`);
+  getSaisons(code: string): Observable<Saison[]> {
+    return this.http.get<Saison[]>(`${this.baseUrl}/${code}/saisons`);
   }
 
-  getEquipes(code: string, annee: string): Observable<Equipe[]> {
-    return this.http.get<Equipe[]>(`${this.baseUrl}/${code}/saisons/${annee}/equipes`);
+  getEquipes(code: string, id: string): Observable<Equipe[]> {
+    return this.http.get<Equipe[]>(`${this.baseUrl}/${code}/saisons/${id}/equipes`);
   }
-
-
-  /**
-   * Récupère le détail d'un championnat par son code.
-   */
-  // getChampionnat(code: string): Observable<Championnat> {
-  //   return this.http.get<Championnat>(`${this.baseUrl}/${code}`);
-  // }
 
   getChampionnat(code: string, sync: boolean = false): Observable<Championnat> {
     const params = { sync: sync.toString() };

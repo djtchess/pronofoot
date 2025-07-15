@@ -1,13 +1,13 @@
 /* -----------------------------------------------------------
-   championnats.component.scss — Dark modern style
+   championnats.component.scss — Dark modern style (v2)
    ----------------------------------------------------------- */
 
 /* ---------- Color palette ---------- */
-$bg-dark:          #121212;   // fond principal
-$card-dark:        #1e1e1e;   // cartes
-$accent-1:         #00adb5;   // turquoise
-$accent-2:         #ff9f1c;   // orange
-$text-light:       #e0e0e0;
+$bg-dark:   #121212;   // fond principal
+$card-dark: #1e1e1e;   // cartes
+$accent-1:  #00adb5;   // turquoise
+$accent-2:  #ff9f1c;   // orange
+$text-light:#e0e0e0;
 
 /* ---------- Layout container ---------- */
 .championnats-container {
@@ -25,60 +25,67 @@ $text-light:       #e0e0e0;
   border-radius: 1rem;
   padding: 1.25rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform .25s ease, box-shadow .25s ease;
+  cursor: pointer;          /* toujours cliquable */
 
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
   }
+
+  /* titre */
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: $accent-1;
+    margin: 0 0 .75rem;
+  }
 }
 
-/* ---------- Title ---------- */
-.championnat-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: $accent-1;
-  margin-bottom: 0.75rem;
-}
 
 /* ---------- Seasons list ---------- */
 .saisons-list {
   list-style: none;
-  padding-left: 0;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: .5rem;
 
-  li a {
-    display: inline-block;
-    padding: 0.25rem 0.6rem;
-    border-radius: 0.5rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: $text-light;
-    text-decoration: none;
-    background: mix($accent-2, $card-dark, 25%);   // subtil orange
-    transition: background 0.25s;
+  li {
+    /* message “aucune saison” */
+    &.empty { 
+      color: darken($text-light, 25%);
+      font-style: italic;
+    }
 
-    &:hover {
-      background: $accent-2;
+    a {
+      display: inline-block;
+      padding: .25rem .6rem;
+      border-radius: .5rem;
+      font-size: .85rem;
+      font-weight: 500;
+      color: $text-light;
+      text-decoration: none;
+      background: mix($accent-2, $card-dark, 25%);
+      transition: background .25s;
+
+      &:hover {
+        background: $accent-2;
+      }
+
+      /* lien actif via RouterLinkActive="active" */
+      &.active {
+        background: $accent-1;
+        color: #fff;
+      }
     }
   }
 }
 
 /* ---------- Scrollbar (desktop) ---------- */
 @media (hover: hover) {
-  ::-webkit-scrollbar {
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 3px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
+  ::-webkit-scrollbar        { height: 6px; }
+  ::-webkit-scrollbar-track  { background: transparent; }
+  ::-webkit-scrollbar-thumb  { background: rgba(255,255,255,.12); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.25); }
 }

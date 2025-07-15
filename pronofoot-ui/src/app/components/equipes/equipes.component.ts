@@ -17,16 +17,17 @@ export class EquipesComponent implements OnInit {
   equipes$!: Observable<Equipe[]>;
 
   code!: string;
-  annee!: string;
+  id!: string;
 
   constructor(private route: ActivatedRoute, private championnatService: ChampionnatService) {}
 
   ngOnInit(): void {
-    this.equipes$ = this.route.params.pipe(
+    console.log('EquipesComponent appelé : '+this.code+' - '+this.id);
+    this.equipes$ = this.route.parent!.params.pipe(
       switchMap(params => {
         this.code = params['code'];
-        this.annee = params['annee'];
-        return this.championnatService.getEquipes(this.code, this.annee);
+        this.id = params['id'];
+        return this.championnatService.getEquipes(this.code, this.id);
       })
     );
   }

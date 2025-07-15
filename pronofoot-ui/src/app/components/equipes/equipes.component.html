@@ -1,5 +1,5 @@
 <div class="equipes-container" *ngIf="equipes$ | async as equipes">
-  <h2 class="equipes-title">Équipes {{ code }} - Saison {{ annee }}</h2>
+  <h2 class="equipes-title">Équipes {{ code }} - Saison {{ id }}</h2>
   <ul class="equipes-list">
     <li *ngFor="let equipe of equipes">
       {{ equipe.nom }}

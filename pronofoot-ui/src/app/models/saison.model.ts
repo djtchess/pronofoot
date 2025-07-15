@@ -1,5 +1,6 @@
 export interface Saison {
-  year: string;
+  id: number;
+  year: number;
   startDate: string;
   endDate: string;
 }

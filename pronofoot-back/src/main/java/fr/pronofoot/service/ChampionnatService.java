@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.pronofoot.dto.ChampionnatDto;
-import fr.pronofoot.dto.ChampionnatSaisonDto;
 import fr.pronofoot.dto.CompetitionItem;
 import fr.pronofoot.dto.SaisonDto;
 import fr.pronofoot.entity.Championnat;
@@ -51,12 +50,12 @@ public class ChampionnatService {
         }
     }
 
-    public void saveChampionnatSaisonAvecEquipes(ChampionnatSaisonDto dto) {
-        Championnat championnat = championnatRepository.findByCode(dto.getCodeChampionnat())
-                .orElseGet(() -> championnatRepository.save(new Championnat(dto.getCodeChampionnat(), dto.getNomChampionnat())));
+    public void saveChampionnatSaisonAvecEquipes(ChampionnatDto dto) {
+        Championnat championnat = championnatRepository.findByCode(dto.getCode())
+                .orElseGet(() -> championnatRepository.save(new Championnat(dto.getCode(), dto.getNom())));
 
-        Saison saison = saisonRepository.findByAnnee(dto.getAnneeSaison())
-                .orElseGet(() -> saisonRepository.save(new Saison(dto.getAnneeSaison())));
+        Saison saison = saisonRepository.findById(dto.getCurrentSeason().getId())
+                .orElseGet(() -> {throw new RuntimeException("saison inconnue");});
 
         ChampionnatSaison championnatSaison = championnatSaisonRepository
                 .findByChampionnatIdAndSaisonId(championnat.getId(), saison.getId())
@@ -65,7 +64,7 @@ public class ChampionnatService {
         // Si dto.getEquipes() est null ou vide, on récupère les équipes via l'API
         Set<String> nomsEquipes = dto.getEquipes();
         if (nomsEquipes == null || nomsEquipes.isEmpty()) {
-            nomsEquipes = footballApiService.getEquipes(dto.getCodeChampionnat(), dto.getAnneeSaison());
+            nomsEquipes = footballApiService.getEquipes(dto.getCode(), dto.getCurrentSeason().getYear());
         }
 
         for (String nomEquipe : nomsEquipes) {
@@ -101,6 +100,7 @@ public class ChampionnatService {
 
     public ChampionnatDto synchronizeAndReturnChampionnat(String code) {
         ChampionnatDto apiDto = footballApiService.getChampionnatDetails(code);
+        this.saveChampionnatSaisonAvecEquipes(apiDto);
 
         // 1. Sauvegarde ou récupération du championnat
         Championnat championnat = championnatRepository.findByCode(code)
@@ -168,20 +168,20 @@ public class ChampionnatService {
                 .orElse(null);
     }
 
-    public List<String> getSaisonsPourChampionnat(String codeChampionnat) {
+    public List<SaisonDto> getSaisonsPourChampionnat(String codeChampionnat) {
         Optional<Championnat> championnatOpt = championnatRepository.findByCode(codeChampionnat);
         if (championnatOpt.isEmpty()) return List.of();
 
         return championnatSaisonRepository.findByChampionnatId(championnatOpt.get().getId()).stream()
-                .map(cs -> cs.getSaison().getAnnee())
+                .map(cs -> new SaisonDto(cs.getSaison().getId(), null,  null, cs.getSaison().getAnnee()))
                 .distinct()
                 .sorted()
                 .collect(Collectors.toList());
     }
 
-    public List<Equipe> getEquipesParChampionnatEtSaison(String codeChampionnat, String anneeSaison) {
+    public List<Equipe> getEquipesParChampionnatEtSaison(String codeChampionnat, String id) {
         Optional<Championnat> championnatOpt = championnatRepository.findByCode(codeChampionnat);
-        Optional<Saison>       saisonOpt       = saisonRepository.findByAnnee(anneeSaison);
+        Optional<Saison>       saisonOpt       = saisonRepository.findById(Long.valueOf(id));
         if (championnatOpt.isEmpty() || saisonOpt.isEmpty()) return List.of();
 
         Optional<ChampionnatSaison> csOpt = championnatSaisonRepository

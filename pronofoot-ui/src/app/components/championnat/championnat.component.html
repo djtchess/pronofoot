@@ -1,4 +1,4 @@
-<div *ngIf="championnat$ | async as championnat">
+<div class="championnat-wrapper" *ngIf="championnat$ | async as championnat">
   <h2>{{ championnat.nom }} ({{ championnat.code }})</h2>
   <p>Pays : {{ championnat.pays }}</p>
 
@@ -8,6 +8,15 @@
     <li>Début : {{ championnat.currentSeason.startDate }}</li>
     <li>Fin : {{ championnat.currentSeason.endDate }}</li>
   </ul>
+<!-- lien interne, reste dans ChampionnatComponent -->
+<a [routerLink]="['equipes']"
+   routerLinkActive="font-bold underline">
+  Voir les équipes
+</a>
 
+
+  <br>
   <button (click)="onSync()">🔄 Synchroniser avec l'API</button>
 </div>
+<!-- contenu de la vue enfant -->
+<router-outlet></router-outlet>

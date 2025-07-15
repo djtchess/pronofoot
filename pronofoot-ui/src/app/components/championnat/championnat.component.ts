@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { ChampionnatService } from '../../services/championnat.service';
 import { Championnat } from '../../models/championnat.model';
 import { AsyncPipe, NgIf } from '@angular/common';
@@ -10,12 +10,13 @@ import { Observable, switchMap, BehaviorSubject } from 'rxjs';
   selector: 'app-championnat',
   templateUrl: './championnat.component.html',
   styleUrls: ['./championnat.component.scss'],
-  imports: [NgIf, AsyncPipe]
+  imports: [NgIf, AsyncPipe, RouterLink, RouterOutlet]
 })
 export class ChampionnatComponent implements OnInit {
   championnat$!: Observable<Championnat>;
   private syncTrigger = new BehaviorSubject<boolean>(false);
   private code!: string;
+
 
   constructor(private route: ActivatedRoute, private championnatService: ChampionnatService) {}
 
