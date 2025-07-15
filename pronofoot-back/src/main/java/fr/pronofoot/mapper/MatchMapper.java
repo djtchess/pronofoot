@@ -13,12 +13,14 @@ public interface MatchMapper {
     @Mapping(target = "date", expression = "java(java.time.LocalDate.parse(dto.getDate()))")
     @Mapping(target = "equipeDomicile", ignore = true)
     @Mapping(target = "equipeExterieur", ignore = true)
+    @Mapping(target = "numJournee", ignore = true)
     @Mapping(target = "championnatSaison", ignore = true)
     Match toEntity(MatchDto dto);
 
     @Mapping(target = "date", expression = "java(entity.getDate().toString())")
     @Mapping(target = "equipeDomicile", source = "equipeDomicile.nom")
     @Mapping(target = "equipeExterieur", source = "equipeExterieur.nom")
+    @Mapping(target = "numJournee", source = "numJournee")
     @Mapping(target = "championnatCode", source = "championnatSaison.championnat.code")
     @Mapping(target = "saisonAnnee", source = "championnatSaison.saison.annee")
     MatchDto toDto(Match entity);

@@ -3,7 +3,8 @@ import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { ChampionnatService } from '../../services/championnat.service';
 import { Championnat } from '../../models/championnat.model';
 import { AsyncPipe, NgIf } from '@angular/common';
-import { Observable, switchMap, BehaviorSubject } from 'rxjs';
+import { Observable, switchMap, BehaviorSubject, take } from 'rxjs';
+import { MatchService } from '../../services/match.service';
 
 @Component({
   standalone: true,
@@ -18,7 +19,7 @@ export class ChampionnatComponent implements OnInit {
   private code!: string;
 
 
-  constructor(private route: ActivatedRoute, private championnatService: ChampionnatService) {}
+  constructor(private route: ActivatedRoute, private championnatService: ChampionnatService, private matchService: MatchService) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -38,8 +39,23 @@ export class ChampionnatComponent implements OnInit {
     this.syncTrigger.next(sync); // déclenche la requête
   }
 
+  /** Bouton « Synchroniser avec l’API » */
   onSync(): void {
-    this.reloadChampionnat(true);
+    // 1) récupérer l’année de la saison courante pour le paramètre `saison`
+    this.championnat$
+      .pipe(take(1))
+      .subscribe(champ => {
+        const saison = champ.currentSeason.year.toString();
+
+        // 2) appeler l’endpoint d’import
+        this.matchService.importMatches(this.code, saison).subscribe({
+          next: () => {
+            // 3) puis rafraîchir l’affichage en demandant une sync complète
+            this.reloadChampionnat(true);
+          },
+          error: err => console.error('Erreur lors de l’import des matchs :', err)
+        });
+      });
   }
 }
 

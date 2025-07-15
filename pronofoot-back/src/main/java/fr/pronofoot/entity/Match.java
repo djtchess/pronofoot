@@ -18,6 +18,8 @@ public class Match {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "match_seq")
     private Long id;
 
+    private Long numJournee;
+
     private LocalDate date;
 
     @ManyToOne(optional = false)
@@ -51,6 +53,14 @@ public class Match {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getNumJournee() {
+        return numJournee;
+    }
+
+    public void setNumJournee(Long numJournee) {
+        this.numJournee = numJournee;
     }
 
     public LocalDate getDate() {

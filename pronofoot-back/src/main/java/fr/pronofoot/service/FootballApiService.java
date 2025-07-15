@@ -56,6 +56,7 @@ public class FootballApiService {
                         dto.setEquipeExterieur(m.get("awayTeam").get("name").asText());
                         dto.setScoreDomicile(m.get("score").get("fullTime").get("home").isNull() ? null : m.get("score").get("fullTime").get("home").asInt());
                         dto.setScoreExterieur(m.get("score").get("fullTime").get("away").isNull() ? null : m.get("score").get("fullTime").get("away").asInt());
+                        dto.setNumJournee(m.hasNonNull("matchday") ? m.get("matchday").asLong() : null);
                         dto.setChampionnatCode(championnatCode);
                         dto.setSaisonAnnee(saison);
                         result.add(dto);

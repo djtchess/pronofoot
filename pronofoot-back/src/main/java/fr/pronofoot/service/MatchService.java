@@ -46,9 +46,9 @@ public class MatchService {
                 Match match = matchMapper.toEntity(dto);
                 match.setEquipeDomicile(equipeDomicile);
                 match.setEquipeExterieur(equipeExterieur);
+                match.setNumJournee(dto.getNumJournee());
                 match.setChampionnatSaison(championnatSaison);
                 match.setDate(date);
-
                 matchRepository.save(match);
             }
         }

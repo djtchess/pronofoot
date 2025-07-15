@@ -1,6 +1,8 @@
 package fr.pronofoot.dto;
 
 public class MatchDto {
+
+    private Long numJournee;
     private String date;
     private String equipeDomicile;
     private String equipeExterieur;
@@ -8,6 +10,14 @@ public class MatchDto {
     private Integer scoreExterieur;
     private String championnatCode;
     private String saisonAnnee;
+
+    public Long getNumJournee() {
+        return numJournee;
+    }
+
+    public void setNumJournee(Long numJournee) {
+        this.numJournee = numJournee;
+    }
 
     public String getDate() {
         return date;

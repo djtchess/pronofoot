@@ -1,13 +1,29 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Match } from '../models/match.model';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
-  private readonly baseUrl = '/matchs';
+  // private readonly baseUrl = '/matchs';
+    private readonly baseUrl = 'http://localhost:8088/api/matches';
 
   constructor(private http: HttpClient) {}
+
+    /**
+   * Déclenche l’import des matches côté back‑end.
+   * @param code   Code du championnat (PL, FL1, SA, …)
+   * @param saison Année de début de saison (ex. 2024 pour 2024‑2025)
+   */
+  importMatches(code: string, saison: string): Observable<string> {
+    const params = new HttpParams()
+      .set('code', code)
+      .set('saison', saison);
+
+    return this.http.post(
+      `${this.baseUrl}/import`, null,  { params, responseType: 'text' }
+    );
+  }
 
   getMatchsByChampionnat(code: string, withoutScores = false): Observable<Match[]> {
     const url = withoutScores
