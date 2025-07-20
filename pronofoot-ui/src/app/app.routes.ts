@@ -34,13 +34,19 @@ export const routes: Routes = [
             .then(m => m.EquipesComponent),
       },
       {
-        path: 'journees/:saison',                // <- nouvelle route
+        path: 'journees/:saison',               
         loadComponent: () =>
           import('./components/matchday/matchday.component')
             .then(m => m.MatchdayComponent)
       },
+      {
+        path: 'classement',
+        loadComponent: () =>
+          import('./components/classement/classement.component')
+            .then(m => m.ClassementComponent)
+      },
 
-      { path: '', redirectTo: 'equipes', pathMatch: 'full' }
+      { path: '', redirectTo: 'classement', pathMatch: 'full' }
     ],
   },
 

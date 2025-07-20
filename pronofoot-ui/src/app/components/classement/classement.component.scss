@@ -1,0 +1,44 @@
+
+/* conteneur */
+.classement-wrapper {
+  background: var(--clr-surface-1);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
+  max-width: 680px;
+  margin-inline: auto;
+  color: var(--clr-text-primary);
+}
+
+.title {
+  margin: 0 0 1rem;
+  text-align: center;
+  color: var(--clr-accent-light);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .875rem;
+
+  th, td {
+    padding: .55rem .6rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+
+  th {
+    background: var(--clr-surface-2);
+    font-weight: 600;
+  }
+
+  tbody tr:nth-child(odd) td {
+    background: var(--clr-surface-3);
+  }
+
+  .equipe  { text-align: left; padding-left: 1rem; }
+  .points  { font-weight: 700; color: var(--clr-accent-light); }
+}

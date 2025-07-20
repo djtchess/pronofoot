@@ -11,6 +11,9 @@ import fr.pronofoot.entity.Match;
 
 @Repository
 public interface MatchRepository extends JpaRepository<Match, Long> {
+
+    List<Match> findByChampionnatSaisonIdAndScoreDomicileNotNullAndScoreExterieurNotNull(Long championnatSaisonId);
+
     List<Match> findByChampionnatSaisonId(Long championnatSaisonId);
 
     boolean existsByDateAndEquipeDomicileAndEquipeExterieur(LocalDateTime date, Equipe equipeDomicile, Equipe equipeExterieur);

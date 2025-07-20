@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.pronofoot.dto.ChampionnatDto;
 import fr.pronofoot.dto.SaisonDto;
 import fr.pronofoot.dto.record.EquipeDto;
+import fr.pronofoot.dto.record.TeamStandingDto;
 import fr.pronofoot.service.ChampionnatService;
-import fr.pronofoot.service.FootballApiService;
+import fr.pronofoot.service.ClassementService;
 
 @RestController
 @RequestMapping("/api/championnats")
@@ -23,8 +24,7 @@ import fr.pronofoot.service.FootballApiService;
 public class ChampionnatController {
 
     @Autowired private ChampionnatService championnatService;
-
-    @Autowired private FootballApiService footballApiService;
+    @Autowired private ClassementService  classementService;
 
     // 🔄 Synchronise tous les championnats depuis l'API
 //    @PostMapping("/sync")
@@ -78,5 +78,12 @@ public class ChampionnatController {
         return ResponseEntity.ok(equipes);
     }
 
+    @GetMapping("/{code}/saisons/{seasonId}/classement")
+    public ResponseEntity<List<TeamStandingDto>> getClassement(
+            @PathVariable String code,
+            @PathVariable Long seasonId) {
 
+        List<TeamStandingDto> classement = classementService.computeClassement(code, seasonId);
+        return ResponseEntity.ok(classement);
+    }
 }

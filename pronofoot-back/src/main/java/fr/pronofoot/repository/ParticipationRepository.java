@@ -13,4 +13,5 @@ import fr.pronofoot.entity.Participation;
 public interface ParticipationRepository extends JpaRepository<Participation, Long> {
     boolean existsByEquipeAndChampionnatSaison(Equipe equipe, ChampionnatSaison championnatSaison);
     List<Participation> findByChampionnatSaison(ChampionnatSaison championnatSaison);
+    List<Participation> findByChampionnatSaisonId( Long championnatSaisonId);
 }

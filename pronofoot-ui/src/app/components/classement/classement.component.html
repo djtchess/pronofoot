@@ -1,0 +1,28 @@
+<div class="classement-wrapper" *ngIf="classement$ | async as rows">
+
+  <h2 class="title">Classement</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th>
+        <th>BP</th><th>BC</th><th>Diff</th><th>Pts</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of rows">
+        <td>{{ r.position }}</td>
+        <td class="equipe">{{ r.equipe }}</td>
+        <td>{{ r.joues }}</td>
+        <td>{{ r.gagnes }}</td>
+        <td>{{ r.nuls }}</td>
+        <td>{{ r.perdus }}</td>
+        <td>{{ r.butsPour }}</td>
+        <td>{{ r.butsContre }}</td>
+        <td>{{ r.goalDifference }}</td>
+        <td class="points">{{ r.points }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
