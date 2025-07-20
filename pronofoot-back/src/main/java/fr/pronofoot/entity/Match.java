@@ -1,6 +1,6 @@
 package fr.pronofoot.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +20,7 @@ public class Match {
 
     private Long numJournee;
 
-    private LocalDate date;
+    private LocalDateTime date;
 
     @ManyToOne(optional = false)
     private Equipe equipeDomicile;
@@ -37,7 +37,7 @@ public class Match {
     public Match() {
     }
 
-    public Match(Long id, LocalDate date, Equipe equipeDomicile, Equipe equipeExterieur, Integer scoreDomicile, Integer scoreExterieur, ChampionnatSaison championnatSaison) {
+    public Match(Long id, LocalDateTime date, Equipe equipeDomicile, Equipe equipeExterieur, Integer scoreDomicile, Integer scoreExterieur, ChampionnatSaison championnatSaison) {
         this.id = id;
         this.date = date;
         this.equipeDomicile = equipeDomicile;
@@ -63,11 +63,11 @@ public class Match {
         this.numJournee = numJournee;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

@@ -1,26 +1,49 @@
-<div class="matchday-wrapper" *ngIf="matches$ | async as matches">
+<div class="matchday-wrapper" *ngIf="groupedByDate$ | async as grouped">
+
+  <!-- Sélecteur de journée -->
   <label>
     Journée&nbsp;
     <select
-    [ngModel]="selectedJournee()"          
-    (ngModelChange)="onJourneeChange($event)"  
-    class="journee-select">
-    <option *ngFor="let j of matchdays" [value]="j">{{ j }}</option>
+      [ngModel]="selectedJournee()"
+      (ngModelChange)="onJourneeChange($event)"
+      class="journee-select">
+      <option *ngFor="let j of matchdays" [value]="j">{{ j }}</option>
     </select>
-
   </label>
 
-  <ul class="match-list">
-    <li *ngFor="let m of matches" class="match-item">
-      <span class="date">
-        {{ m.date | date : 'dd/MM' }}
-      </span>
-      <span class="teams">
-        {{ m.equipeDomicile }} – {{ m.equipeExterieur }}
-      </span>
-      <span class="score" *ngIf="m.scoreDomicile !== null">
-        {{ m.scoreDomicile }}-{{ m.scoreExterieur }}
-      </span>
-    </li>
-  </ul>
+  <!-- Matches de la journée, regroupés par date -->
+  <ng-container *ngFor="let entry of grouped | keyvalue : sortByDate">
+    <h3 class="date-title">{{ entry.key | date : 'EEEE d MMMM yyyy' }}</h3>
+
+    <ul class="match-list">
+      <li *ngFor="let m of entry.value" class="match-item">
+
+        <!-- heure -->
+        <span class="time">{{ m.date | date : 'HH:mm' }}</span>
+
+        <!-- équipe domicile -->
+        <span class="team home"
+              [class.winner]="m.scoreDomicile > m.scoreExterieur">
+          {{ m.equipeDomicile }}
+        </span>
+
+        <!-- score (ou tiret avant coup d’envoi) -->
+        <span class="score">
+          <ng-container *ngIf="m.scoreDomicile !== null; else dash">
+            {{ m.scoreDomicile }}-{{ m.scoreExterieur }}
+          </ng-container>
+          <ng-template #dash>–</ng-template>
+        </span>
+
+        <!-- équipe extérieure -->
+        <span class="team away"
+              [class.winner]="m.scoreExterieur > m.scoreDomicile">
+          {{ m.equipeExterieur }}
+        </span>
+      </li>
+
+
+
+    </ul>
+  </ng-container>
 </div>

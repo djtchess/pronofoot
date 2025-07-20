@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,18 +27,18 @@ public class ChampionnatController {
     @Autowired private FootballApiService footballApiService;
 
     // 🔄 Synchronise tous les championnats depuis l'API
-    @PostMapping("/sync")
-    public ResponseEntity<Void> synchronizeChampionnats() {
-        championnatService.loadCompetitionsFromApi();
-        return ResponseEntity.ok().build();
-    }
+//    @PostMapping("/sync")
+//    public ResponseEntity<Void> synchronizeChampionnats() {
+//        championnatService.loadCompetitionsFromApi();
+//        return ResponseEntity.ok().build();
+//    }
 
-    // ➕ Importe un championnat pour une saison avec ses équipes
-    @PostMapping("/import")
-    public ResponseEntity<String> importChampionnatSaison(@RequestBody ChampionnatDto dto) {
-        championnatService.saveChampionnatSaisonAvecEquipes(dto);
-        return ResponseEntity.ok("Championnat et équipes importés pour la saison " + dto.getCurrentSeason().getYear());
-    }
+//    // ➕ Importe un championnat pour une saison avec ses équipes
+//    @PostMapping("/import")
+//    public ResponseEntity<String> importChampionnatSaison(@RequestBody ChampionnatDto dto) {
+//        championnatService.saveChampionnatSaisonAvecEquipes(dto);
+//        return ResponseEntity.ok("Championnat et équipes importés pour la saison " + dto.getCurrentSeason().getYear());
+//    }
 
     // 📋 Liste tous les championnats disponibles
     @GetMapping

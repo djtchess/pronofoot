@@ -1,6 +1,6 @@
 package fr.pronofoot.repository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +13,7 @@ import fr.pronofoot.entity.Match;
 public interface MatchRepository extends JpaRepository<Match, Long> {
     List<Match> findByChampionnatSaisonId(Long championnatSaisonId);
 
-    boolean existsByDateAndEquipeDomicileAndEquipeExterieur(LocalDate date, Equipe equipeDomicile, Equipe equipeExterieur);
+    boolean existsByDateAndEquipeDomicileAndEquipeExterieur(LocalDateTime date, Equipe equipeDomicile, Equipe equipeExterieur);
 
 
     /* pour toute la saison */

@@ -1,8 +1,8 @@
 // src/app/components/championnat/championnat.component.ts
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
-import { AsyncPipe, NgIf } from '@angular/common';
-import { take, switchMap, BehaviorSubject, Observable } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { AsyncPipe, DatePipe, NgIf } from '@angular/common';
+import { take, switchMap, BehaviorSubject, Observable, finalize, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';   
 
 
@@ -25,33 +25,50 @@ export class ChampionnatComponent implements OnInit {
   private readonly syncTrigger = new BehaviorSubject<boolean>(false);
 
   /** Code du championnat dans l’URL (`:code`) */
-  private code = '';
+  code = '';
 
   /*— DI par inject() pour alléger le constructeur —*/
   private readonly route = inject(ActivatedRoute);
   private readonly championnatService = inject(ChampionnatService);
   private readonly matchService = inject(MatchService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   /* ------------------------------------------------------------------ */
   /* cycle de vie                                                       */
   /* ------------------------------------------------------------------ */
-  ngOnInit(): void {
-    /* écoute du param :code */
+ ngOnInit(): void {
+
+    /* Écoute du changement du paramètre :code                            */
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
+
         this.code = params['code'];
 
-        /* initialisation (une seule fois) du flux championnat$ */
+        /* (Ré)initialise le flux championnat$                            */
         this.championnat$ = this.syncTrigger.pipe(
           switchMap(sync =>
             this.championnatService.getChampionnat(this.code, sync)
           )
         );
 
-        /* premier chargement (sans forcer la synchro back) */
+        /* Premier chargement (sans resynchronisation)                    */
         this.syncTrigger.next(false);
+
+        /* Si l’URL n’a pas encore `saisons/:id`, on y redirige            */
+        this.championnat$
+          .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+          .subscribe(champ => {
+            const hasId = this.route.snapshot.paramMap.has('id');
+            if (!hasId && champ.currentSeason) {
+              this.router.navigate(
+                ['/championnats', this.code,
+                 'saisons', champ.currentSeason.year],
+                { replaceUrl: true }
+              );
+            }
+          });
       });
   }
 
@@ -59,22 +76,24 @@ export class ChampionnatComponent implements OnInit {
   /* méthodes publiques (visibles dans le template)                      */
   /* ------------------------------------------------------------------ */
 
-  /** Bouton « Synchroniser avec l’API » */
+/** Bouton « Synchroniser avec l’API »                                 */
   onSync(): void {
-    /* 1) récupérer la saison courante pour l’endpoint d’import */
-    this.championnat$
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe(champ => {
-        const saison = champ.currentSeason.year.toString();
-
-        /* 2) appel back-end pour importer tous les matches */
-        this.matchService.importMatches(this.code, saison).subscribe({
-          next: () => this.reloadChampionnat(true),   // 3) rafraîchit l’affichage
-          error: err =>
-            console.error('Erreur lors de l’import des matchs :', err)
-        });
-      });
+    this.championnatService.getChampionnat(this.code, /* sync */ true).pipe(
+      take(1),
+      /* Quand le championnat est synchronisé, on importe les matches     */
+      switchMap(champ =>
+        this.matchService.importMatches(
+          this.code,
+          champ.currentSeason?.year.toString() ?? ''
+        )
+      ),
+      tap(() => this.reloadChampionnat(true))
+    ).subscribe({
+      error: err => console.error('Synchronisation KO :', err)
+    });
   }
+
+
 
   /* ------------------------------------------------------------------ */
   /* helpers privés                                                     */

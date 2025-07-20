@@ -40,7 +40,7 @@ export const routes: Routes = [
             .then(m => m.MatchdayComponent)
       },
 
-      { path: '', redirectTo: 'journees/auto', pathMatch: 'full' }
+      { path: '', redirectTo: 'equipes', pathMatch: 'full' }
     ],
   },
 

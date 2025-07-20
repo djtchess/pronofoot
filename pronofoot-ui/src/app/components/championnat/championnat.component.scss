@@ -1,104 +1,141 @@
-/* -----------------------------------------------------------
-   championnat.component.scss — Night-blue detail page
-   ----------------------------------------------------------- */
+/* ----------------------------------------
+   BANNIÈRE GLOBALE — THÈME BLEU NUIT
+----------------------------------------- */
+.championnat-banner {
+  /* Dégradé principal : bleu marine ➜ bleu azur, diagonal */
+  background-image:
+    /* halo nocturne très léger pour la profondeur */
+    radial-gradient(
+      circle at 15% 25%,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0) 60%
+    ),
+    linear-gradient(
+      120deg,
+      #001428 0%,     /* Bleu nuit absolu */
+      #002856 30%,    /* Navy */
+      #004e91 65%,    /* Bleu roi */
+      #0091d5 100%    /* Azur / cyan profond */
+    );
 
-/* ---------- Palette partagée (mêmes valeurs que equipes.scss) ---------- */
-$bg-night:    #0d1020;
-$panel-night: #141a2e;
-$accent-1:    #1e90ff;   // bleu électrique
-$accent-2:    #4dd2ff;   // cyan lumineux
-$text-light:  #e0f2ff;
+  color: #e8f0ff;                /* texte bleu-gris très clair */
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .25);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: transform .25s ease;
 
-/* ---------- Wrapper / panneau ---------- */
-.championnat-wrapper {
-  background: $panel-night;
-  padding: 2rem 1.75rem;
-  border-radius: 1rem;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .55);
-  max-width: 680px;
-  margin: 2rem auto;
-  color: $text-light;
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
 }
 
-/* ---------- Titres ---------- */
-h2 {
-  font-size: 1.6rem;
+/* ----------------------------------------
+   BLOCS INTERNES
+----------------------------------------- */
+.championnat-info h2 {
+  margin: 0;
+  font-size: 1.75rem;
   font-weight: 600;
-  color: $accent-1;
-  margin: 0 0 1rem;
 }
 
-h4 {
-  font-size: 1.15rem;
-  margin: 1.25rem 0 .5rem;
-  color: lighten($accent-1, 10%);
+.championnat-code {
+  font-size: 1.125rem;
+  font-weight: 400;
+  opacity: .85;
 }
 
-/* ---------- Liste « Saison actuelle » ---------- */
-ul {
+.championnat-pays {
+  margin-top: .25rem;
+  font-size: .9375rem;
+  opacity: .9;
+}
+
+.saison h4 {
+  margin: 0 0 .25rem;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  opacity: .75;
+}
+
+.saison ul {
   list-style: none;
   padding: 0;
-  margin: 0 0 1.25rem;
-
-  li {
-    margin-bottom: .35rem;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    /* étiquette ”Année :” plus pâle */
-    &::before {
-      content: '• ';
-      color: $accent-2;
-    }
-  }
+  margin: 0;
+  font-size: .9375rem;
+  line-height: 1.4;
 }
 
-/* ---------- Lien « Voir les équipes » ---------- */
-a[routerLink] {
-  display: inline-block;
-  margin-top: .75rem;
-  padding: .4rem 1rem;
-  border-radius: .6rem;
-  background: transparent;
-  color: $accent-2;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background .25s, color .25s, box-shadow .25s;
+/* ----------------------------------------
+   BOUTONS (palette nuit)
+----------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
 
-  &:hover {
-    background: rgba($accent-2, .12);
-    color: lighten($accent-2, 15%);
-    box-shadow: 0 0 6px rgba($accent-2, .6);
-  }
-
-  &.font-bold { font-weight: 600; }
-}
-
-/* ---------- Bouton « Synchroniser » ---------- */
-button {
-  margin-top: 1.5rem;
-  padding: .55rem 1.2rem;
-  border: none;
-  border-radius: .6rem;
-  background: $accent-1;
-  color: #fff;
+  padding: .5rem 1.25rem;
+  border-radius: .75rem;
   font-weight: 600;
+  font-size: .9375rem;
+  line-height: 1.25rem;
+  text-decoration: none;
   cursor: pointer;
-  transition: background .25s, box-shadow .25s;
 
-  &:hover {
-    background: lighten($accent-1, 8%);
-    box-shadow: 0 0 8px rgba($accent-1, .55);
-  }
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  transition: background .2s ease, color .2s ease, transform .15s ease;
+  user-select: none;
 
-  &:active {
-    background: darken($accent-1, 6%);
-  }
+  &:active { transform: translateY(1px); }
 }
 
-/* ---------- Outlet spacing ---------- */
-router-outlet ~ * {
-  margin-top: 2rem;
+/* ––– Primaire : bleu clair sur fond nuit ––– */
+.btn-primary {
+  background: #e0f2ff;             /* bleu glacial */
+  color: #003566;                  /* navy profond */
+
+  &:hover         { background: #cce9ff; }
+  &:focus-visible { outline: 2px solid #7ec8ff; }
+}
+
+/* ––– Secondaire : cyan électrique ––– */
+.btn-secondary {
+  background: #00b4d8;             /* cyan médian */
+  color: #001428;                  /* bleu nuit */
+
+  &:hover         { background: #1dd4f2; }
+  &:focus-visible { outline: 2px solid #7ee5ff; }
+}
+
+/* ––– Contour translucide nuit ––– */
+.btn-outline {
+  background: transparent;
+  color: #e8f0ff;
+  border: 1px solid rgba(232, 240, 255, .7);
+
+  &:hover {
+    background: #e8f0ff;
+    color: #003566;
+  }
+  &:focus-visible { outline: 2px solid #7ec8ff; }
+}
+
+/* ----------------------------------------
+   CONTAINER D'ACTIONS
+----------------------------------------- */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
 }

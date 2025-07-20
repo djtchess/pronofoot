@@ -1,88 +1,59 @@
-/* -----------------------------------------------------------
-   equipes.component.scss — Night-blue modern style
-   ----------------------------------------------------------- */
+/* ----------------------------------------
+   ÉQUIPE LIST — THÈME BLEU NUIT
+----------------------------------------- */
 
-/* ---------- Palette ---------- */
-$bg-night:      #0d1020;   // fond global : bleu-nuit profond
-$panel-night:   #141a2e;   // cartes / panneaux
-$accent-1:      #1e90ff;   // bleu électrique
-$accent-2:      #4dd2ff;   // cyan lumineux
-$text-light:    #e0f2ff;   // gris-bleuté très clair
-
-/* ---------- Wrapper ---------- */
+/* conteneur principal */
 .equipes-container {
-  background: $bg-night;
-  min-height: 100vh;
-  padding: 2rem 1.5rem;
+  background: #001428;                   /* bleu nuit profond */
+  padding: clamp(1rem, 2vw, 2rem);
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+  max-width: 640px;
+  margin-inline: auto;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #e8f0ff;                        /* texte gris-bleu très clair */
 }
 
-/* ---------- Title ---------- */
+/* titre */
 .equipes-title {
-  color: $accent-1;
-  font-size: 1.4rem;
+  margin: 0 0 1rem;
+  font-size: 1.5rem;                     /* ≈ text-2xl */
   font-weight: 600;
-  margin-bottom: 1.25rem;
+  text-align: center;
+  color: #7ec8ff;                        /* bleu glacier clair */
 }
 
-/* ---------- List ---------- */
+/* liste des équipes */
 .equipes-list {
   list-style: none;
+  margin: 0;
   padding: 0;
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-}
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: .75rem;
+  overflow: hidden;
 
-.equipes-list li {
-  background: $panel-night;
-  color: $text-light;
-  padding: 0.7rem 1rem;
-  border-radius: 0.8rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-  transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+  li {
+    padding: .6rem 1rem;
+    background: #002856;                 /* navy */
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
 
-  /* reflet néon bleu au survol */
-  &:hover {
-    transform: translateY(-3px);
-    background: lighten($panel-night, 4%);
-    box-shadow: 0 0 8px 2px rgba($accent-1, 0.5),
-                0 6px 18px rgba(0, 0, 0, 0.6);
+    &:nth-child(odd) {
+      background: mix(#002856, #001428, 70%);
+    }
+
+    &:last-child { border-bottom: none; }
   }
 }
 
-/* ---------- Back link ---------- */
-a[routerLink] {
+/* lien retour */
+.back-link {
   display: inline-block;
-  margin-top: 2rem;
-  color: $accent-2;
+  margin-top: 1rem;
+  font-size: .9375rem;                   /* ≈ text-sm */
+  color: #00b4d8;                        /* cyan */
   text-decoration: none;
-  font-weight: 500;
-  transition: color .25s ease, text-shadow .25s ease;
+  font-weight: 600;
 
-  &:hover {
-    color: lighten($accent-2, 12%);
-    text-shadow: 0 0 6px rgba($accent-2, .8);
-  }
-}
-
-/* Lien “Retour” — blanc / gris clair */
-.back-link,
-.back-link:visited,
-.back-link:focus,
-.back-link:hover {
-  color: #ffffff;
-  text-decoration: none;
-}
-.back-link:hover {
-  color: #d6d6d6;
-}
-
-/* ---------- Scrollbar (desktop) ---------- */
-@media (hover: hover) {
-  ::-webkit-scrollbar        { height: 6px; }
-  ::-webkit-scrollbar-track  { background: transparent; }
-  ::-webkit-scrollbar-thumb  { background: rgba(255,255,255,.15); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.30); }
+  &:hover         { text-decoration: underline; }
+  &:focus-visible { outline: 2px solid #7ec8ff; outline-offset: 2px; }
 }

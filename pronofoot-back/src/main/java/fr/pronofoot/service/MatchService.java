@@ -1,6 +1,8 @@
 package fr.pronofoot.service;
 
-import java.time.LocalDate;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,11 @@ public class MatchService {
 
     public void saveMatches(List<MatchDto> dtos) {
         for (MatchDto dto : dtos) {
-            LocalDate date = LocalDate.parse(dto.getDate());
+            Instant instant = Instant.parse(dto.getDate());          // "2025-03-29T21:30:00Z"
+            LocalDateTime date = LocalDateTime.ofInstant(
+                    instant,
+                    ZoneId.of("Europe/Paris")                            // ou ZoneOffset.UTC
+            );
 
             ChampionnatSaison championnatSaison = championnatSaisonRepository
                     .findByChampionnat_CodeAndSaison_Annee(dto.getChampionnatCode(), dto.getSaisonAnnee())

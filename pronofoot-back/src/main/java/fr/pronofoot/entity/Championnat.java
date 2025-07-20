@@ -6,9 +6,13 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -29,6 +33,15 @@ public class Championnat {
 
     @OneToMany(mappedBy = "championnat", cascade = CascadeType.ALL)
     private List<ChampionnatSaison> saisons = new ArrayList<>();
+
+    /**
+     * Saison actuellement en cours (FK current_season_id).
+     * Nullable : certains championnats n’ont peut-être pas encore commencé.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_season_id",
+            foreignKey = @ForeignKey(name = "championnat_current_season_fk"))
+    private Saison currentSeason;
 
     public Championnat() {}
 
@@ -53,5 +66,13 @@ public class Championnat {
 
     public void setSaisons(List<ChampionnatSaison> saisons) {
         this.saisons = saisons;
+    }
+
+    public Saison getCurrentSeason() {
+        return currentSeason;
+    }
+
+    public void setCurrentSeason(Saison currentSeason) {
+        this.currentSeason = currentSeason;
     }
 }

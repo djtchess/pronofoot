@@ -1,106 +1,104 @@
 // src/app/components/matchday/matchday.component.ts
-import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
-import { MatchService} from '../../services/match.service';
 import {
-  BehaviorSubject,
-  map,
-  Observable,
-  switchMap,
-  take
-} from 'rxjs';
+  Component, OnInit, signal
+} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import {
+  AsyncPipe, DatePipe, KeyValuePipe, NgFor, NgIf, KeyValue
+} from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Match } from '../../models/match.model';
+
+import {
+  BehaviorSubject, Observable, map, switchMap, take
+} from 'rxjs';
+
+import { MatchService } from '../../services/match.service';
+import { Match        } from '../../models/match.model';
 
 @Component({
-  standalone: true,
-  selector: 'app-matchday',
+  standalone : true,
+  selector   : 'app-matchday',
   templateUrl: './matchday.component.html',
-  styleUrls: ['./matchday.component.scss'],
-  imports: [NgIf, NgFor, AsyncPipe, DatePipe, FormsModule]
+  styleUrls  : ['./matchday.component.scss'],
+  imports    : [NgIf, NgFor, AsyncPipe, DatePipe, KeyValuePipe, FormsModule]
 })
 export class MatchdayComponent implements OnInit {
-  // liste des journées disponibles
+
+  /* ───────── liste et sélection de journées ───────── */
   matchdays: number[] = [];
+  selectedJournee = signal<number>(1);                 // signal Angular 18
 
-  // journée sélectionnée (signal = réactif natif Angular 18)
-  selectedJournee = signal<number>(1);
+  /* ───────── flux des matches groupés par date ───────── */
+  groupedByDate$!: Observable<Record<string, Match[]>>;
 
-  // flux des matches à afficher
-  matches$!: Observable<Match[]>;
+  private readonly journeeTrigger = new BehaviorSubject<number>(1);
 
-  private code = '';
+  /* ───────── paramètres d’URL ───────── */
+  private code   = '';
   private saison = '';
 
-  // déclencheur pour recharger quand la journée change
-  private journeeTrigger = new BehaviorSubject<number>(1);
-
   constructor(
-    private route: ActivatedRoute,
-    private matchService: MatchService
+    private readonly route        : ActivatedRoute,
+    private readonly matchService : MatchService
   ) {}
 
-  /* ------------------------------------------------------------------ */
-  /* matchday.component.ts — ngOnInit corrigé                            */
-  /* ------------------------------------------------------------------ */
+  /* ───────── cycle de vie ───────── */
   ngOnInit(): void {
-    console.log('MatchdayComponent init appelé');
 
-    /* 1) lire les paramètres une seule fois */
-    this.code   = this.route.parent!.snapshot.paramMap.get('code')!;     // ← parent
-    this.saison = this.route.snapshot.paramMap.get('saison')!;           // ← courant
+    /* 1) lire les paramètres */
+    this.code   = this.route.parent!.snapshot.paramMap.get('code')!;
+    this.saison = this.route.snapshot.paramMap.get('saison')!;
 
-    /* 2) charger tous les matches de la saison */
-    this.matchService.getAllMatches(this.code, this.saison)
-      .pipe(take(1))
+    /* 2) récupérer tous les matches pour lister les journées disponibles */
+    this.matchService.getAllMatches(this.code, this.saison).pipe(take(1))
       .subscribe(all => {
 
-        /* --- extraire les journées --- */
-        this.matchdays = Array.from(
-          new Set(
-            all
-              .map(m => m.numJournee)
-              .filter((j): j is number => j !== undefined && j !== null)  // type-guard
-          )
-        ).sort((a, b) => a - b);
+        this.matchdays = [...new Set(
+          all.filter(m => m.numJournee != null).map(m => m.numJournee!)
+        )].sort((a, b) => a - b);
 
-        /* --- déterminer la prochaine journée (si au moins un match) --- */
-        let next = this.matchdays[0] ?? 1;   // valeur par défaut
+        /* choisir la première journée à venir / incomplète, sinon la dernière */
+        const today = new Date();
+        const next =
+          all.filter(m =>
+                m.numJournee != null &&
+               (new Date(m.date) >= today ||
+                m.scoreDomicile == null || m.scoreExterieur == null))
+             .sort((a, b) =>
+               new Date(a.date).getTime() - new Date(b.date).getTime())[0]
+            ?.numJournee ?? this.matchdays.at(-1) ?? 1;
 
-        if (all.length) {
-          const today = new Date();
-          next =
-            all
-              .filter(
-                m =>
-                  new Date(m.date) >= today ||
-                  m.scoreDomicile === null ||
-                  m.scoreExterieur === null
-              )
-              .sort(
-                (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-              )[0]?.numJournee ?? this.matchdays.at(-1)!;
-        }
-
-        /* --- mettre à jour le signal + déclencher le flux --- */
         this.selectedJournee.set(next);
         this.journeeTrigger.next(next);
       });
 
-    /* 3) flux des matches pour la journée sélectionnée */
-    this.matches$ = this.journeeTrigger.pipe(
+    /* 3) flux : matches d’une journée → regroupés par date ISO */
+    this.groupedByDate$ = this.journeeTrigger.pipe(
       switchMap(j =>
-        this.matchService.getMatchesByJournee(this.code, this.saison, j)
+        this.matchService.getMatchesByJournee(this.code, this.saison, j).pipe(
+          map(list =>
+            list.reduce<Record<string, Match[]>>((acc, m) => {
+              const key = new Date(m.date).toISOString().slice(0, 10); // yyyy-MM-dd
+              (acc[key] ||= []).push(m);
+              return acc;
+            }, {})
+          )
+        )
       )
     );
   }
 
+  /* ───────── events ───────── */
 
-  /** appelé quand l’utilisateur change la journée dans la liste */
+  /** sélection dans la liste déroulante */
   onJourneeChange(j: number): void {
-    this.selectedJournee.set(j);   // met à jour le signal
-    this.journeeTrigger.next(j);   // relance la requête API
+    this.selectedJournee.set(j);
+    this.journeeTrigger.next(j);
   }
 
+  /* ───────── helpers pour le template ───────── */
+
+  sortByDate = (a: KeyValue<string, Match[]>,
+                b: KeyValue<string, Match[]>): number =>
+    a.key.localeCompare(b.key);        // clé = yyyy-MM-dd croissant
 }

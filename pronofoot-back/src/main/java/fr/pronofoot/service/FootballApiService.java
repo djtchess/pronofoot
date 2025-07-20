@@ -51,7 +51,7 @@ public class FootballApiService {
                     JsonNode matches = json.get("matches");
                     for (JsonNode m : matches) {
                         MatchDto dto = new MatchDto();
-                        dto.setDate(m.get("utcDate").asText().substring(0, 10));
+                        dto.setDate(m.get("utcDate").asText());
                         dto.setEquipeDomicile(m.get("homeTeam").get("name").asText());
                         dto.setEquipeExterieur(m.get("awayTeam").get("name").asText());
                         dto.setScoreDomicile(m.get("score").get("fullTime").get("home").isNull() ? null : m.get("score").get("fullTime").get("home").asInt());

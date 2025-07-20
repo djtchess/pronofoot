@@ -1,26 +1,34 @@
-<div class="championnat-wrapper" *ngIf="championnat$ | async as championnat">
-  <h2>{{ championnat.nom }} ({{ championnat.code }})</h2>
-  <p>Pays : {{ championnat.pays }}</p>
+<!-- Affiche la bannière du championnat -->
+<div class="championnat-banner" *ngIf="championnat$ | async as championnat">
 
-  <h4>Saison actuelle</h4>
-  <ul>
-    <li>Année : {{ championnat.currentSeason.year }}</li>
-    <li>Début : {{ championnat.currentSeason.startDate }}</li>
-    <li>Fin : {{ championnat.currentSeason.endDate }}</li>
-  </ul>
-  <!-- lien interne, reste dans ChampionnatComponent -->
-  <a [routerLink]="['equipes']"
-    routerLinkActive="font-bold underline">
-    Voir les équipes
-  </a>
-  <!-- nouveau lien vers MatchdayComponent -->
-  <a [routerLink]="['journees', championnat.currentSeason.year]"
-    routerLinkActive="font-bold underline">
-    Calendrier / Journées
-  </a>
+  <!-- Bloc informations principales -->
+  <div class="championnat-info">
+    <h2>
+      {{ championnat.nom }} : {{ championnat.currentSeason.year }}
+    </h2>
+    <p class="championnat-pays">Pays&nbsp;: {{ championnat.pays }}</p>
+  </div>
 
-  <br>
-  <button (click)="onSync()">🔄 Synchroniser avec l'API</button>
+  <!-- Bloc actions -->
+  <div class="actions">
+    <a class="btn btn-primary"
+       [routerLink]="['equipes']">
+       Voir les équipes
+    </a>
+
+    <a class="btn btn-secondary"
+       [routerLink]="['journees', championnat.currentSeason.year]">
+       Calendrier / Journées
+    </a>
+
+    <button type="button"
+            class="btn btn-outline"
+            aria-label="Synchroniser les données"
+            (click)="onSync()">
+      🔄 Synchroniser
+    </button>
+  </div>
 </div>
-<!-- contenu de la vue enfant -->
+
+<!-- Contenu de la vue enfant (routes internes) -->
 <router-outlet></router-outlet>

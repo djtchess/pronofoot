@@ -1,90 +1,120 @@
-/* matchday.component.scss
-   – palette & variables --------------------------------------------- */
-$clr-bg:          #f9fafb;     // page background
-$clr-surface:     #ffffff;     // cards / list items
-$clr-text:        #1f2937;     // primary text
-$clr-accent:      #2563eb;     // blue-600
-$clr-accent-dark: #1e40af;     // blue-800
-$clr-border:      #e5e7eb;     // gray-200
-$radius:          0.75rem;     // 12 px
-$shadow:          0 1px 2px rgba(#000, .06), 0 1px 4px rgba(#000, .04);
+/* ============================================================
+   MATCHDAY – Thème BLEU NUIT
+   Ce fichier peut être importé dans le composant stand-alone ou
+   dans styles.scss si tu préfères global.
+   Il s’appuie sur les variables CSS définies dans styles.scss.
+=============================================================== */
 
-/* wrapper ----------------------------------------------------------- */
+/* ------------------------------------------------------------------
+   Wrapper principal
+------------------------------------------------------------------- */
 .matchday-wrapper {
-  background: $clr-bg;
+  background: var(--clr-surface-1);
   padding: clamp(1rem, 2vw, 2rem);
-  border-radius: $radius;
-  box-shadow: $shadow;
-  max-width: 640px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
+  max-width: 720px;
   margin-inline: auto;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: $clr-text;
+  color: var(--clr-text-primary);
 }
 
-/* label + select ---------------------------------------------------- */
+/* ------------------------------------------------------------------
+   Sélecteur de journée
+------------------------------------------------------------------- */
 label {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: .5rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .journee-select {
   appearance: none;
-  padding: 0.4rem 1.8rem 0.4rem 0.8rem;
-  border: 1px solid $clr-border;
-  border-radius: 0.5rem;
-  background: $clr-surface url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg' fill='%232563eb'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-              no-repeat right 0.6rem center/0.7rem;
+  padding: .45rem 2.2rem .45rem .9rem;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: .5rem;
+  background:
+    var(--clr-surface-2)
+    url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg' fill='%23e8f0ff'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e8f0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right .7rem center/0.7rem;
+  color: var(--clr-text-primary);
   font-weight: 500;
   line-height: 1.2;
   cursor: pointer;
   transition: border-color .2s;
 
+  &:hover         { border-color: var(--clr-accent); }
   &:focus-visible {
     outline: none;
-    border-color: $clr-accent;
-    box-shadow: 0 0 0 3px rgba($clr-accent, .25);
+    border-color: var(--clr-accent);
+    box-shadow: 0 0 0 3px rgba(0,180,216,.35);
   }
 }
 
-/* match list -------------------------------------------------------- */
+/* ------------------------------------------------------------------
+   Titre de date (YYYY-MM-DD)
+------------------------------------------------------------------- */
+.date-title {
+  margin: 1.5rem 0 .75rem;
+  font-size: 1.125rem;            /* ≈ text-xl */
+  font-weight: 600;
+  color: var(--clr-accent-light);
+}
+
+/* ------------------------------------------------------------------
+   Liste des matches (grille 4 colonnes alignées)
+------------------------------------------------------------------- */
 .match-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  border: 1px solid $clr-border;
-  border-radius: $radius;
-  overflow: hidden;          // clip last-border radii
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: .75rem;
+  overflow: hidden;
 }
 
 .match-item {
   display: grid;
-  grid-template-columns: 4.5rem 1fr auto;
+  /* heure | équipe dom. | score | équipe ext. */
+  grid-template-columns: 4.5rem 1fr 3.3rem 1fr;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 0.9rem;
-  background: $clr-surface;
+  gap: 0.75rem;
+  padding: .7rem 1rem;
+  background: var(--clr-surface-2);
 
-  &:nth-child(odd) { background: mix($clr-surface, $clr-bg, 92%); }
-  &:not(:last-child) { border-bottom: 1px solid $clr-border; }
+  &:nth-child(odd)   { background: var(--clr-surface-3); }
+  &:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,.08); }
 
-  .date   { font-variant-numeric: tabular-nums; font-weight: 600; }
-  .teams  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .score  { font-weight: 700; color: $clr-accent-dark; }
+  .time  {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    text-align: right;
+    color: var(--clr-text-secondary);
+  }
+
+  .team {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    &.winner { font-weight: 700; }
+  }
+
+  .score {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--clr-accent-light);
+  }
 }
 
-/* responsiveness ---------------------------------------------------- */
+/* ------------------------------------------------------------------
+   Responsive (mobile ≤ 480px)
+------------------------------------------------------------------- */
 @media (max-width: 480px) {
   .match-item {
-    grid-template-columns: 3.5rem 1fr;
-    grid-template-areas:
-      "date score"
-      "teams teams";
-
-    .date   { grid-area: date; }
-    .teams  { grid-area: teams; }
-    .score  { grid-area: score; text-align: right; }
+    grid-template-columns: 3.2rem 1fr 2.8rem 1fr;
+    gap: 0.45rem;
+    padding: .6rem .8rem;
   }
 }
