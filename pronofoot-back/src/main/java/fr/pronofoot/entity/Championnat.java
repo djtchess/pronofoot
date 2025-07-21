@@ -32,7 +32,7 @@ public class Championnat {
     private String nom;
 
     @OneToMany(mappedBy = "championnat", cascade = CascadeType.ALL)
-    private List<ChampionnatSaison> saisons = new ArrayList<>();
+    private List<Saison> saisons = new ArrayList<>();
 
     /**
      * Saison actuellement en cours (FK current_season_id).
@@ -60,11 +60,11 @@ public class Championnat {
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
 
-    public List<ChampionnatSaison> getSaisons() {
+    public List<Saison> getSaisons() {
         return saisons;
     }
 
-    public void setSaisons(List<ChampionnatSaison> saisons) {
+    public void setSaisons(List<Saison> saisons) {
         this.saisons = saisons;
     }
 

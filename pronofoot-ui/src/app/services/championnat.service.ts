@@ -23,8 +23,8 @@ export class ChampionnatService {
     return this.http.get<Equipe[]>(`${this.baseUrl}/${code}/saisons/${id}/equipes`);
   }
 
-  getChampionnat(code: string, sync: boolean = false): Observable<Championnat> {
+  getChampionnat(code: string, saisonId: string, sync: boolean = false): Observable<Championnat> {
     const params = { sync: sync.toString() };
-    return this.http.get<Championnat>(`${this.baseUrl}/${code}`, { params });
+    return this.http.get<Championnat>(`${this.baseUrl}/${code}/${saisonId}`, { params });
   }
 }

@@ -109,18 +109,19 @@ public class FootballApiService {
         }
 
         // Récupération de toutes les saisons (optionnel)
-//        JsonNode seasonsNode = node.path("seasons");
-//        if (seasonsNode.isArray()) {
-//            List<SaisonDto> saisons = new ArrayList<>();
-//            for (JsonNode s : seasonsNode) {
-//                SaisonDto saison = new SaisonDto();
-//                saison.setYear(s.path("startDate").asText().substring(0, 4));
-//                saison.setStartDate(LocalDate.parse(s.path("startDate").asText()));
-//                saison.setEndDate(LocalDate.parse(s.path("endDate").asText()));
-//                saisons.add(saison);
-//            }
-//            dto.set(saisons);
-//        }
+        JsonNode seasonsNode = node.path("seasons");
+        if (seasonsNode.isArray()) {
+            List<SaisonDto> saisons = new ArrayList<>();
+            for (JsonNode s : seasonsNode) {
+                SaisonDto saison = new SaisonDto();
+                saison.setId(s.get("id").asLong());
+                saison.setYear(s.path("startDate").asText().substring(0, 4));
+                saison.setStartDate(LocalDate.parse(s.path("startDate").asText()));
+                saison.setEndDate(LocalDate.parse(s.path("endDate").asText()));
+                saisons.add(saison);
+            }
+            dto.setSaisons(saisons);
+        }
 
         return dto;
     }

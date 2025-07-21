@@ -1,5 +1,6 @@
 package fr.pronofoot.dto;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -10,16 +11,18 @@ public class ChampionnatDto {
     private SaisonDto currentSeason;
 
     private Set<String> equipes;
+    private List<SaisonDto> saisons;
 
     public ChampionnatDto() {
     }
 
-    public ChampionnatDto(String code, String nom, String pays, SaisonDto currentSeason, Set<String> equipes) {
+    public ChampionnatDto(String code, String nom, String pays, SaisonDto currentSeason, Set<String> equipes, List<SaisonDto> saison) {
         this.code = code;
         this.nom = nom;
         this.pays = pays;
         this.currentSeason = currentSeason;
         this.equipes = equipes;
+        this.saisons = saisons;
     }
 
     public String getCode() {
@@ -60,5 +63,13 @@ public class ChampionnatDto {
 
     public void setCurrentSeason(SaisonDto currentSeason) {
         this.currentSeason = currentSeason;
+    }
+
+    public List<SaisonDto> getSaisons() {
+        return saisons;
+    }
+
+    public void setSaisons(List<SaisonDto> saisons) {
+        this.saisons = saisons;
     }
 }

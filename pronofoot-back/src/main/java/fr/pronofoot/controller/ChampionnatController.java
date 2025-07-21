@@ -52,10 +52,10 @@ public class ChampionnatController {
         return ResponseEntity.ok(championnatService.getSaisonsPourChampionnat(code));
     }
 
-    @GetMapping("/{code}")
-    public ResponseEntity<ChampionnatDto> getChampionnat(@PathVariable String code, @RequestParam(defaultValue = "false") boolean sync) {
+    @GetMapping("/{code}/{saisonId}")
+    public ResponseEntity<ChampionnatDto> getChampionnat(@PathVariable String code, @PathVariable String saisonId, @RequestParam(defaultValue = "false") boolean sync) {
         ChampionnatDto dto = sync
-                ? championnatService.synchronizeAndReturnChampionnat(code)
+                ? championnatService.synchronizeAndReturnChampionnat(code, saisonId)
                 : championnatService.getChampionnatFromDb(code);
 
         if (dto == null) {

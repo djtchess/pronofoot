@@ -56,7 +56,7 @@ export class ChampionnatComponent implements OnInit {
         /* (Ré)initialise le flux championnat$                            */
         this.championnat$ = this.syncTrigger.pipe(
           switchMap(sync =>
-            this.championnatService.getChampionnat(this.code, sync)
+            this.championnatService.getChampionnat(this.code, '2420', sync)
           )
         );
 
@@ -85,7 +85,7 @@ export class ChampionnatComponent implements OnInit {
 
 /** Bouton « Synchroniser avec l’API »                                 */
   onSync(): void {
-    this.championnatService.getChampionnat(this.code, /* sync */ true).pipe(
+    this.championnatService.getChampionnat(this.code, '2420', /* sync */ true).pipe(
       take(1),
       /* Quand le championnat est synchronisé, on importe les matches     */
       switchMap(champ =>

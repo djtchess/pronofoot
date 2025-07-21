@@ -1,13 +1,12 @@
 package fr.pronofoot.entity;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 
@@ -21,18 +20,20 @@ public class Saison {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    @OneToMany(mappedBy = "saison", cascade = CascadeType.ALL)
-    private List<ChampionnatSaison> championnats = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "championnat_id",
+            foreignKey = @ForeignKey(name = "saison_championnat_fk"))
+    private Championnat championnat;
 
     public Saison() {
     }
 
-    public Saison(Long id, String annee, LocalDate startDate, LocalDate endDate, List<ChampionnatSaison> championnats) {
+    public Saison(Long id, String annee, LocalDate startDate, LocalDate endDate, Championnat championnat) {
         this.id = id;
         this.annee = annee;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.championnats = championnats;
+        this.championnat = championnat;
     }
 
     public Saison(String annee) {
@@ -71,11 +72,11 @@ public class Saison {
         this.endDate = endDate;
     }
 
-    public List<ChampionnatSaison> getChampionnats() {
-        return championnats;
+    public Championnat getChampionnat() {
+        return championnat;
     }
 
-    public void setChampionnats(List<ChampionnatSaison> championnats) {
-        this.championnats = championnats;
+    public void setChampionnat(Championnat championnat) {
+        this.championnat = championnat;
     }
 }

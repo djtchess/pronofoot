@@ -70,15 +70,17 @@ public class ChampionnatService {
      * Enregistre (ou met à jour) les équipes pour <b>n'importe quelle</b> saison d'un championnat.
      * Les entités manquantes (championnat, saison, lien ChampionnatSaison) sont créées au besoin.
      *
-     * @param codeChampionnat code alpha (ex. "PD" = La Liga)
-     * @param saisonDto           année de début de la saison (ex. 2024 pour 2024‑2025)
      */
-    public void saveTeamsForSeason(String codeChampionnat, SaisonDto saisonDto) {
-        Championnat championnat = getOrCreateChampionnat(codeChampionnat);
-        Saison saison           = getOrCreateSaison(saisonDto);
+    public void saveTeamsForSeason(ChampionnatDto championnatDto, SaisonDto saisonDto) {
+        Championnat championnat = getOrCreateChampionnat(championnatDto.getCode());
+        Saison saison           = getOrCreateSaison(saisonDto, championnat);
         ChampionnatSaison cs    = getOrCreateChampionnatSaison(championnat, saison);
-
         persistTeams(championnat.getCode(), saison.getAnnee(), cs);
+        championnatDto.getSaisons().forEach(seasonDto -> {
+            Saison season           = getOrCreateSaison(seasonDto, championnat);
+            ChampionnatSaison championnatSaison    = getOrCreateChampionnatSaison(championnat, season);
+            persistTeams(championnat.getCode(), season.getAnnee(), championnatSaison);
+        });
     }
 
 //    /**
@@ -103,14 +105,14 @@ public class ChampionnatService {
     @Transactional(readOnly = true)
     public List<ChampionnatDto> getAllChampionnats() {
         return championnatRepository.findAll().stream()
-                .map(c -> new ChampionnatDto(c.getCode(), c.getNom(), null, null, null))
+                .map(c -> new ChampionnatDto(c.getCode(), c.getNom(), null, null, null, null))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public ChampionnatDto getChampionnat(String code) {
         return championnatRepository.findByCode(code)
-                .map(c -> new ChampionnatDto(c.getCode(), c.getNom(), null, null, null))
+                .map(c -> new ChampionnatDto(c.getCode(), c.getNom(), null, null, null, null))
                 .orElseThrow(() -> new EntityNotFoundException("Championnat non trouvé : " + code));
     }
 
@@ -118,10 +120,10 @@ public class ChampionnatService {
      * Synchronise un championnat + sa saison courante depuis l'API puis le renvoie (DTO).
      */
     @Transactional
-    public ChampionnatDto synchronizeAndReturnChampionnat(String code) {
-        ChampionnatDto apiDto = footballApiService.getChampionnatDetails(code);
-        saveTeamsForSeason(code, apiDto.getCurrentSeason());
-        return apiDto;
+    public ChampionnatDto synchronizeAndReturnChampionnat(String code, String saisonId) {
+        ChampionnatDto championnatDto = footballApiService.getChampionnatDetails(code);
+        saveTeamsForSeason(championnatDto, championnatDto.getCurrentSeason());
+        return championnatDto;
     }
 
     @Transactional(readOnly = true)
@@ -171,7 +173,7 @@ public class ChampionnatService {
                 .orElseGet(() -> championnatRepository.save(new Championnat(codeChampionnat, codeChampionnat)));
     }
 
-    private Saison getOrCreateSaison(SaisonDto dto) {
+    private Saison getOrCreateSaison(SaisonDto dto, Championnat championnat) {
         return saisonRepository.findById(dto.getId())
                 .orElseGet(() -> {
                     Saison s = new Saison();
@@ -179,6 +181,7 @@ public class ChampionnatService {
                     s.setAnnee(dto.getYear());
                     s.setStartDate(dto.getStartDate());
                     s.setEndDate(dto.getEndDate());
+                    s.setChampionnat(championnat);
                     return saisonRepository.save(s);
                 });
     }
@@ -226,7 +229,6 @@ public class ChampionnatService {
         // 2) À défaut, prendre la plus récente dans la liste des relations
         if (saison == null && championnat.getSaisons() != null && !championnat.getSaisons().isEmpty()) {
             saison = championnat.getSaisons().stream()
-                    .map(ChampionnatSaison::getSaison)
                     .max(Comparator.comparing(Saison::getAnnee))
                     .orElse(null);
         }
