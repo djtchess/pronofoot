@@ -139,3 +139,41 @@
     flex-direction: row;
   }
 }
+
+/* ------------------------------------------------------------------
+   Disposition classement (gauche) / contenu (droite)
+------------------------------------------------------------------- */
+/* ------------------------------------------------------------------
+   Disposition : tableau + vue détail côte à côte
+------------------------------------------------------------------- */
+.championnat-body {
+  display: flex;
+  align-items: flex-start;
+
+  /* le conteneur se réduit à la largeur réelle des deux colonnes   */
+  width: fit-content;
+  margin-inline: auto;          /* centre l’ensemble dans la page   */
+}
+
+.classement-pane {
+  flex: 0 0 320px;              /* largeur fixe du classement       */
+}
+
+.detail-pane {
+  flex: 0 0 auto;               /* prend seulement sa largeur utile */
+  margin-left: 1.5rem;          /* léger écart à droite du tableau  */
+}
+
+/* Mobile : empile les deux blocs                                    */
+@media (max-width: 768px) {
+  .championnat-body {
+    flex-direction: column;
+    width: 100%;                /* pleine largeur sur mobile        */
+  }
+
+  .detail-pane {
+    margin-left: 0;
+    margin-top : 1.5rem;
+  }
+}
+

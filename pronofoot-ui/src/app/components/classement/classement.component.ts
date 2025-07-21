@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient }        from '@angular/common/http';
-import { ActivatedRoute }    from '@angular/router';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { Observable }        from 'rxjs';
-import { map, switchMap }    from 'rxjs/operators';
+// src/app/components/classement/classement.component.ts
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
+import { Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
-/* DTO conforme à l’endpoint -------------------------------------- */
 interface TeamStandingDto {
   position:        number;
   equipe:       string;
@@ -24,30 +23,24 @@ interface TeamStandingDto {
   selector   : 'app-classement',
   templateUrl: './classement.component.html',
   styleUrls  : ['./classement.component.scss'],
-  imports    : [NgIf, NgFor, AsyncPipe]
+  imports    : [NgIf, NgForOf, AsyncPipe]
 })
-export class ClassementComponent implements OnInit {
+export class ClassementComponent implements OnChanges {
 
-  classement$!: Observable<TeamStandingDto[]>;
+  @Input({ required: true }) code!: string;
+  @Input({ required: true }) seasonId!: string | number;
 
-  constructor(
-    private readonly http : HttpClient,
-    private readonly route: ActivatedRoute
-  ) {}
+  classement$: Observable<TeamStandingDto[]> = of([]);
 
-  ngOnInit(): void {
-    /* URL attend : /championnats/:code/saisons/:id/classement ---------- */
-    this.classement$ = this.route.parent!.params.pipe(
-      switchMap(params => {
-        const code = params['code'];
-        const id   = params['id'];
-        const url  = `http://localhost:8088/api/championnats/${code}/saisons/${id}/classement`;
-        return this.http.get<TeamStandingDto[]>(url);
-      }),
-      /* ajoute la position (1,2,3, …) pour l’affichage ----------------- */
-      map(list =>
-        list.map((t, idx) => ({ ...t, position: idx + 1 }))
-      )
-    );
+  constructor(private http: HttpClient) {}
+
+  ngOnChanges(ch: SimpleChanges): void {
+    if (this.code && this.seasonId) {
+      const url = `http://localhost:8088/api/championnats/${this.code}/saisons/${this.seasonId}/classement`;
+      this.classement$ = this.http.get<TeamStandingDto[]>(url).pipe(
+        map(list => list.map((t, idx) => ({ ...t, position: idx + 1 })))
+      );
+    }
   }
 }
+4

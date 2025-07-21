@@ -9,17 +9,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChampionnatService } from '../../services/championnat.service';
 import { MatchService } from '../../services/match.service';
 import { Championnat } from '../../models/championnat.model';
+import { ClassementComponent } from '../classement/classement.component';
 
 @Component({
   standalone: true,
   selector: 'app-championnat',
   templateUrl: './championnat.component.html',
   styleUrls: ['./championnat.component.scss'],
-  imports: [NgIf, AsyncPipe, RouterLink, RouterOutlet]
+  imports: [NgIf, AsyncPipe, RouterLink, RouterOutlet, ClassementComponent          ]
 })
 export class ChampionnatComponent implements OnInit {
   /** Flux du championnat (mise à jour via syncTrigger) */
   championnat$!: Observable<Championnat>;
+
+  seasonId: string | null = null;
+
 
   /** Déclencheur interne : `true` ⇒ forcer la synchro back-end puis reload */
   private readonly syncTrigger = new BehaviorSubject<boolean>(false);
@@ -45,6 +49,9 @@ export class ChampionnatComponent implements OnInit {
       .subscribe(params => {
 
         this.code = params['code'];
+        this.seasonId = this.route.snapshot.paramMap.get('id') ?? '';
+
+
 
         /* (Ré)initialise le flux championnat$                            */
         this.championnat$ = this.syncTrigger.pipe(

@@ -30,5 +30,13 @@
   </div>
 </div>
 
-<!-- Contenu de la vue enfant (routes internes) -->
-<router-outlet></router-outlet>
+<!-- Corps : classement à gauche, vue enfant à droite --------------->
+<div class="championnat-body">
+  <app-classement
+      class="classement-pane"
+      [code]="code"
+      [seasonId]="seasonId!">
+  </app-classement>
+  <router-outlet  class="detail-pane"></router-outlet>
+</div>
+
