@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,18 +49,19 @@ public class MatchService {
             Equipe equipeExterieur = equipeRepository.findByNom(dto.getEquipeExterieur())
                     .orElseThrow(() -> new RuntimeException("Équipe non trouvée : " + dto.getEquipeExterieur()));
 
-            boolean exists = matchRepository.existsByDateAndEquipeDomicileAndEquipeExterieur(
-                    date, equipeDomicile, equipeExterieur);
+            Optional<Match> opt = matchRepository.findByChampionnatSaisonAndEquipeDomicileAndEquipeExterieurAndNumJournee(
+                    championnatSaison, equipeDomicile, equipeExterieur, dto.getNumJournee());
 
-            if (!exists) {
-                Match match = matchMapper.toEntity(dto);
-                match.setEquipeDomicile(equipeDomicile);
-                match.setEquipeExterieur(equipeExterieur);
-                match.setNumJournee(dto.getNumJournee());
-                match.setChampionnatSaison(championnatSaison);
-                match.setDate(date);
-                matchRepository.save(match);
-            }
+            Match match = opt.orElseGet(Match::new);
+            match.setChampionnatSaison(championnatSaison);
+            match.setEquipeDomicile(equipeDomicile);
+            match.setEquipeExterieur(equipeExterieur);
+            match.setScoreDomicile(null);
+            match.setScoreExterieur(null);
+            match.setNumJournee(dto.getNumJournee());
+            match.setDate(date);
+            matchRepository.save(match);
+
         }
     }
 

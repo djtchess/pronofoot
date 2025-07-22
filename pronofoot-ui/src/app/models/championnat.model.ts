@@ -6,4 +6,5 @@ export interface Championnat {
   pays: string;
   currentSeason: Saison; 
   equipes: string[];
+  saisons: Saison[];
 }

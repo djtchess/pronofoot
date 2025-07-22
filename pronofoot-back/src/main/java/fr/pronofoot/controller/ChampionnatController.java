@@ -54,7 +54,7 @@ public class ChampionnatController {
 
     @GetMapping("/{code}/{saisonId}")
     public ResponseEntity<ChampionnatDto> getChampionnat(@PathVariable String code, @PathVariable String saisonId, @RequestParam(defaultValue = "false") boolean sync) {
-        ChampionnatDto dto = sync
+            ChampionnatDto dto = sync
                 ? championnatService.synchronizeAndReturnChampionnat(code, saisonId)
                 : championnatService.getChampionnatFromDb(code);
 

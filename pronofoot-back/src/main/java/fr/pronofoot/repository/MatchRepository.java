@@ -1,11 +1,12 @@
 package fr.pronofoot.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import fr.pronofoot.entity.ChampionnatSaison;
 import fr.pronofoot.entity.Equipe;
 import fr.pronofoot.entity.Match;
 
@@ -16,7 +17,7 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
 
     List<Match> findByChampionnatSaisonId(Long championnatSaisonId);
 
-    boolean existsByDateAndEquipeDomicileAndEquipeExterieur(LocalDateTime date, Equipe equipeDomicile, Equipe equipeExterieur);
+    Optional<Match> findByChampionnatSaisonAndEquipeDomicileAndEquipeExterieurAndNumJournee(ChampionnatSaison championnatSaison, Equipe equipeDomicile, Equipe equipeExterieur, Long numJournee);
 
 
     /* pour toute la saison */

@@ -1,14 +1,24 @@
 // src/app/components/championnat/championnat.component.ts
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { AsyncPipe, DatePipe, NgIf } from '@angular/common';
-import { take, switchMap, BehaviorSubject, Observable, finalize, tap } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';   
+import { AsyncPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
+import {
+  take,
+  switchMap,
+  map,                               // ← NEW
+  tap,
+  BehaviorSubject,
+  Observable,
+  forkJoin
+} from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ChampionnatService } from '../../services/championnat.service';
 import { MatchService } from '../../services/match.service';
 import { Championnat } from '../../models/championnat.model';
+import { Saison } from '../../models/saison.model';
 import { ClassementComponent } from '../classement/classement.component';
 
 @Component({
@@ -16,97 +26,119 @@ import { ClassementComponent } from '../classement/classement.component';
   selector: 'app-championnat',
   templateUrl: './championnat.component.html',
   styleUrls: ['./championnat.component.scss'],
-  imports: [NgIf, AsyncPipe, RouterLink, RouterOutlet, ClassementComponent          ]
+  imports: [
+    NgIf,
+    NgForOf,
+    AsyncPipe,
+    RouterLink,
+    RouterOutlet,
+    FormsModule,
+    ClassementComponent
+  ]
 })
 export class ChampionnatComponent implements OnInit {
-  /** Flux du championnat (mise à jour via syncTrigger) */
+
+  /* ---------- flux principal (| async dans le template) ---------- */
   championnat$!: Observable<Championnat>;
 
-  seasonId: string | null = null;
+  /* ---------- copie locale (si besoin hors template) ------------- */
+  private championnat!: Championnat;
 
+  /* ---------- UI « saisons » ------------------------------------- */
+  saisons: Saison[] = [];
+  selectedSeason!: Saison;
 
-  /** Déclencheur interne : `true` ⇒ forcer la synchro back-end puis reload */
+  /* ---------- route params & triggers ---------------------------- */
+  private seasonId!: string;
   private readonly syncTrigger = new BehaviorSubject<boolean>(false);
-
-  /** Code du championnat dans l’URL (`:code`) */
   code = '';
 
-  /*— DI par inject() pour alléger le constructeur —*/
-  private readonly route = inject(ActivatedRoute);
-  private readonly championnatService = inject(ChampionnatService);
-  private readonly matchService = inject(MatchService);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly router = inject(Router);
+  /* ---------- injections ----------------------------------------- */
+  private readonly route            = inject(ActivatedRoute);
+  private readonly router           = inject(Router);
+  private readonly destroyRef       = inject(DestroyRef);
+  private readonly championnatSrv   = inject(ChampionnatService);
+  private readonly matchSrv         = inject(MatchService);
 
-  /* ------------------------------------------------------------------ */
-  /* cycle de vie                                                       */
-  /* ------------------------------------------------------------------ */
- ngOnInit(): void {
+  /* =============================================================== */
+  ngOnInit(): void {
 
-    /* Écoute du changement du paramètre :code                            */
+    /* écoute des paramètres :code & :id                             */
     this.route.params
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
 
-        this.code = params['code'];
-        this.seasonId = this.route.snapshot.paramMap.get('id') ?? '';
+        this.code     = params['code'];
+        this.seasonId = params['id'];
 
-
-
-        /* (Ré)initialise le flux championnat$                            */
+        /* ---- (re)crée le flux championnat$ ---------------------- */
         this.championnat$ = this.syncTrigger.pipe(
           switchMap(sync =>
-            this.championnatService.getChampionnat(this.code, '2420', sync)
-          )
+            forkJoin({
+              champ:   this.championnatSrv.getChampionnat(this.code, this.seasonId!, sync),
+              saisons: this.championnatSrv.getSaisons(this.code)
+            })
+          ),
+          tap(({ champ, saisons }) => {
+            /* copie locale + liste triée décroissante */
+            this.championnat = champ;
+            this.saisons     = [...saisons].sort((a, b) => b.year - a.year);
+            
+
+            /* saison sélectionnée : URL -> currentSeason -> première */
+            const fromUrl = this.seasonId ? this.saisons.find(s => s.id === +this.seasonId!) : undefined;
+            this.selectedSeason = fromUrl ?? champ.currentSeason ?? this.saisons[0];
+          }),
+          /* on ne laisse sortir que le Championnat */
+          map(({ champ }) => champ)
         );
 
-        /* Premier chargement (sans resynchronisation)                    */
+        /* premier chargement (sans resynchronisation)              */
         this.syncTrigger.next(false);
 
-        /* Si l’URL n’a pas encore `saisons/:id`, on y redirige            */
-        this.championnat$
-          .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-          .subscribe(champ => {
-            const hasId = this.route.snapshot.paramMap.has('id');
-            if (!hasId && champ.currentSeason) {
-              this.router.navigate(
-                ['/championnats', this.code,
-                 'saisons', champ.currentSeason.year],
-                { replaceUrl: true }
-              );
-            }
-          });
+        /* redirection si aucun :id dans l’URL                       */
+        if (!this.seasonId) {
+          this.championnat$
+            .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+            .subscribe(champ => {
+              if (champ.currentSeason) {
+                this.router.navigate(
+                  ['/championnats', this.code, 'saisons', champ.currentSeason.year],
+                  { replaceUrl: true }
+                );
+              }
+            });
+        }
       });
   }
 
-  /* ------------------------------------------------------------------ */
-  /* méthodes publiques (visibles dans le template)                      */
-  /* ------------------------------------------------------------------ */
+  /* ----------------- UI callbacks -------------------------------- */
 
-/** Bouton « Synchroniser avec l’API »                                 */
+  /** Changement dans la liste déroulante */
+  onSeasonChange(): void {
+    this.router.navigate(
+      ['/championnats', this.code, 'saisons', this.selectedSeason.id],
+      { replaceUrl: true }
+    );
+  }
+
+  /** Bouton « Synchroniser » */
   onSync(): void {
-    this.championnatService.getChampionnat(this.code, '2420', /* sync */ true).pipe(
+    this.championnatSrv.getChampionnat(this.code, this.seasonId, true).pipe(
       take(1),
-      /* Quand le championnat est synchronisé, on importe les matches     */
       switchMap(champ =>
-        this.matchService.importMatches(
+        this.matchSrv.importMatches(
           this.code,
-          champ.currentSeason?.year.toString() ?? ''
+          this.selectedSeason.year.toString() ?? ''
         )
       ),
-      tap(() => this.reloadChampionnat(true))
+      tap(() => this.reloadChampionnat(false))
     ).subscribe({
       error: err => console.error('Synchronisation KO :', err)
     });
   }
 
-
-
-  /* ------------------------------------------------------------------ */
-  /* helpers privés                                                     */
-  /* ------------------------------------------------------------------ */
-
-  /** Force le rechargement du championnat ; si `sync=true`, le back est interrogé */
+  /* ----------------- helpers privés ------------------------------ */
   private reloadChampionnat(sync: boolean): void {
     this.syncTrigger.next(sync);
   }

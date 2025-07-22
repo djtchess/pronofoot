@@ -46,7 +46,7 @@ export const routes: Routes = [
       //       .then(m => m.ClassementComponent)
       // },
 
-      { path: '', redirectTo: 'equipes', pathMatch: 'full' }
+      { path: '', redirectTo: 'journne/1', pathMatch: 'full' }
     ],
   },
 

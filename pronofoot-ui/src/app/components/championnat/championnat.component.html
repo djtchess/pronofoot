@@ -1,24 +1,42 @@
-<!-- Affiche la bannière du championnat -->
-<div class="championnat-banner" *ngIf="championnat$ | async as championnat">
+<!-- championnat.component.html -->
 
-  <!-- Bloc informations principales -->
+<!-- Affiche la bannière du championnat --------------------------->
+<!-- On garde l'async pipe pour récupérer le Championnat -->
+<div class="championnat-banner"
+     *ngIf="championnat$ | async as championnat">
+
+  <!-- ▸ Infos principales -->
   <div class="championnat-info">
-    <h2>
-      {{ championnat.nom }} : {{ championnat.currentSeason.year }}
-    </h2>
+    <h2>{{ championnat.nom }}</h2>
     <p class="championnat-pays">Pays&nbsp;: {{ championnat.pays }}</p>
   </div>
 
-  <!-- Bloc actions -->
+
+<select class="season-select"
+        [(ngModel)]="selectedSeason"
+        (ngModelChange)="onSeasonChange()"
+        name="saison">
+  <option *ngFor="let s of saisons" [ngValue]="s">
+    {{ s.year }}
+  </option>
+</select>
+
+  <!-- ▸ Saison sélectionnée -->
+  <!-- 🆕  safe-navigation pour éviter l’erreur avant init -->
+  <h2 class="h5">Saison&nbsp;: {{ selectedSeason.year }}</h2>
+
+  <!-- ▸ Actions --------------------------------------------------->
   <div class="actions">
+
+    <!-- 🆕  liens relatifs : on passe l’année de la saison choisie -->
     <a class="btn btn-primary"
        [routerLink]="['equipes']">
        Voir les équipes
     </a>
 
     <a class="btn btn-secondary"
-       [routerLink]="['journees', championnat.currentSeason.year]">
-       Calendrier / Journées
+       [routerLink]="['journees', selectedSeason.year]">
+       Calendrier&nbsp;/ Journées
     </a>
 
     <button type="button"
@@ -30,13 +48,15 @@
   </div>
 </div>
 
-<!-- Corps : classement à gauche, vue enfant à droite --------------->
-<div class="championnat-body">
+<!-- Corps : classement à gauche, vue enfant à droite ------------->
+<div class="championnat-body" *ngIf="selectedSeason">
+
+  <!-- 🆕  on transmet l’id numérique de la saison sélectionnée -->
   <app-classement
       class="classement-pane"
       [code]="code"
-      [seasonId]="seasonId!">
+      [seasonId]="selectedSeason.id">
   </app-classement>
-  <router-outlet  class="detail-pane"></router-outlet>
-</div>
 
+  <router-outlet class="detail-pane"></router-outlet>
+</div>

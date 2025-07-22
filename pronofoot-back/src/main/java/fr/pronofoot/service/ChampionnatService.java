@@ -76,11 +76,11 @@ public class ChampionnatService {
         Saison saison           = getOrCreateSaison(saisonDto, championnat);
         ChampionnatSaison cs    = getOrCreateChampionnatSaison(championnat, saison);
         persistTeams(championnat.getCode(), saison.getAnnee(), cs);
-        championnatDto.getSaisons().forEach(seasonDto -> {
-            Saison season           = getOrCreateSaison(seasonDto, championnat);
-            ChampionnatSaison championnatSaison    = getOrCreateChampionnatSaison(championnat, season);
-            persistTeams(championnat.getCode(), season.getAnnee(), championnatSaison);
-        });
+//        championnatDto.getSaisons().forEach(seasonDto -> {
+//            Saison season           = getOrCreateSaison(seasonDto, championnat);
+//            ChampionnatSaison championnatSaison    = getOrCreateChampionnatSaison(championnat, season);
+//            persistTeams(championnat.getCode(), season.getAnnee(), championnatSaison);
+//        });
     }
 
 //    /**
@@ -137,11 +137,14 @@ public class ChampionnatService {
     public List<SaisonDto> getSaisonsPourChampionnat(String codeChampionnat) {
         return championnatRepository.findByCode(codeChampionnat)
                 .stream()
-                .flatMap(ch -> championnatSaisonRepository.findByChampionnatId(ch.getId()).stream())
-                .map(cs -> new SaisonDto(cs.getSaison().getId(), null, null, cs.getSaison().getAnnee()))
+                .flatMap(ch ->
+                        championnatSaisonRepository.findByChampionnatId(ch.getId()).stream())
+                .map(cs -> new SaisonDto(
+                        cs.getSaison().getId(), null, null, cs.getSaison().getAnnee()))
                 .distinct()
-                .sorted()
+                .sorted(Comparator.comparing(SaisonDto::getYear))
                 .collect(Collectors.toList());
+
     }
 
     @Transactional(readOnly = true)

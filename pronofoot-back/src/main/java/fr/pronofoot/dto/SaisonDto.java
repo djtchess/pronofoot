@@ -1,6 +1,7 @@
 package fr.pronofoot.dto;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class SaisonDto {
     private Long id;
@@ -48,5 +49,18 @@ public class SaisonDto {
 
     public void setYear(String year) {
         this.year = year;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SaisonDto saisonDto = (SaisonDto) o;
+        return Objects.equals(id, saisonDto.id) && Objects.equals(startDate, saisonDto.startDate) && Objects.equals(endDate, saisonDto.endDate) && Objects.equals(year, saisonDto.year);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, startDate, endDate, year);
     }
 }

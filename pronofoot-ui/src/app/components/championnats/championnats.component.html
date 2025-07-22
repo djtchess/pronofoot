@@ -10,23 +10,7 @@
     >
       <h2>{{ item.championnat.nom }} ({{ item.championnat.code }})</h2>
 
-      <ul class="saisons-list" (click)="$event.stopPropagation()">
-        <li *ngIf="!item.saisons.length" class="empty">— aucune saison —</li>
-        <li *ngFor="let saison of item.saisons">
-          <a
-            [routerLink]="[
-              '/championnats',
-              item.championnat.code,
-              'saisons',
-              saison.id
-            ]"
-            routerLinkActive="active"
-            (click)="$event.stopPropagation()"
-          >
-            {{ saison.year }}
-          </a>
-        </li>
-      </ul>
+
     </div>
   </div>
 </ng-container>
