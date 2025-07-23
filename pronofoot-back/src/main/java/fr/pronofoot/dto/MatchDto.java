@@ -10,6 +10,7 @@ public class MatchDto {
     private Integer scoreExterieur;
     private String championnatCode;
     private String saisonAnnee;
+    private Long remoteId;
 
     public Long getNumJournee() {
         return numJournee;
@@ -73,5 +74,13 @@ public class MatchDto {
 
     public void setSaisonAnnee(String saisonAnnee) {
         this.saisonAnnee = saisonAnnee;
+    }
+
+    public Long getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(Long remoteId) {
+        this.remoteId = remoteId;
     }
 }

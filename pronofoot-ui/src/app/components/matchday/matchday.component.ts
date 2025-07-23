@@ -26,11 +26,10 @@ export class MatchdayComponent implements OnInit {
 
   /* ───────── liste et sélection de journées ───────── */
   matchdays: number[] = [];
-  selectedJournee = signal<number>(1);                 // signal Angular 18
+  selectedJournee = signal<number>(1);
 
-  /* ───────── flux des matches groupés par date ───────── */
+  /* ───────── flux des matches groupés par date ─────── */
   groupedByDate$!: Observable<Record<string, Match[]>>;
-
   private readonly journeeTrigger = new BehaviorSubject<number>(1);
 
   /* ───────── paramètres d’URL ───────── */
@@ -45,21 +44,20 @@ export class MatchdayComponent implements OnInit {
   /* ───────── cycle de vie ───────── */
   ngOnInit(): void {
 
-    /* 1) lire les paramètres */
+    /* 1) récupérer paramètres route */
     this.code   = this.route.parent!.snapshot.paramMap.get('code')!;
     this.saison = this.route.snapshot.paramMap.get('saison')!;
 
-    /* 2) récupérer tous les matches pour lister les journées disponibles */
+    /* 2) récupérer toutes les journées pour remplir le <select> */
     this.matchService.getAllMatches(this.code, this.saison).pipe(take(1))
       .subscribe(all => {
-
         this.matchdays = [...new Set(
           all.filter(m => m.numJournee != null).map(m => m.numJournee!)
         )].sort((a, b) => a - b);
 
-        /* choisir la première journée à venir / incomplète, sinon la dernière */
+        /* sélectionner la journée à venir / incomplète ou la dernière */
         const today = new Date();
-        const next =
+        const next  =
           all.filter(m =>
                 m.numJournee != null &&
                (new Date(m.date) >= today ||
@@ -72,7 +70,7 @@ export class MatchdayComponent implements OnInit {
         this.journeeTrigger.next(next);
       });
 
-    /* 3) flux : matches d’une journée → regroupés par date ISO */
+    /* 3) flux de matches groupés par date */
     this.groupedByDate$ = this.journeeTrigger.pipe(
       switchMap(j =>
         this.matchService.getMatchesByJournee(this.code, this.saison, j).pipe(
@@ -90,15 +88,29 @@ export class MatchdayComponent implements OnInit {
 
   /* ───────── events ───────── */
 
-  /** sélection dans la liste déroulante */
+  /** changement dans la liste déroulante */
   onJourneeChange(j: number): void {
     this.selectedJournee.set(j);
     this.journeeTrigger.next(j);
   }
 
-  /* ───────── helpers pour le template ───────── */
+  /** bouton : mise à jour des scores de cette journée */
+  refreshScoresJournee(): void {
+    const j = this.selectedJournee();
+    this.matchService
+        .updateScoresJournee(this.code, this.saison, j)
+        .subscribe(() => this.journeeTrigger.next(j));  // rechargement
+  }
 
+  /** bouton : mise à jour des scores avant aujourd’hui */
+  refreshScoresBeforeToday(): void {
+    this.matchService
+        .updateScoresBeforeToday(this.code, this.saison)
+        .subscribe(() => this.journeeTrigger.next(this.selectedJournee()));
+  }
+
+  /* ───────── helper tri clé/valeur ───────── */
   sortByDate = (a: KeyValue<string, Match[]>,
                 b: KeyValue<string, Match[]>): number =>
-    a.key.localeCompare(b.key);        // clé = yyyy-MM-dd croissant
+    a.key.localeCompare(b.key);          // yyyy-MM-dd croissant
 }

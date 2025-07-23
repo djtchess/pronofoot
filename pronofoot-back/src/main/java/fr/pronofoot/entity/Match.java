@@ -31,13 +31,15 @@ public class Match {
     private Integer scoreDomicile;
     private Integer scoreExterieur;
 
+    private Long remoteId;
+
     @ManyToOne(optional = false)
     private ChampionnatSaison championnatSaison;
 
     public Match() {
     }
 
-    public Match(Long id, LocalDateTime date, Equipe equipeDomicile, Equipe equipeExterieur, Integer scoreDomicile, Integer scoreExterieur, ChampionnatSaison championnatSaison) {
+    public Match(Long id, LocalDateTime date, Equipe equipeDomicile, Equipe equipeExterieur, Integer scoreDomicile, Integer scoreExterieur, ChampionnatSaison championnatSaison, Long remoteId) {
         this.id = id;
         this.date = date;
         this.equipeDomicile = equipeDomicile;
@@ -45,6 +47,7 @@ public class Match {
         this.scoreDomicile = scoreDomicile;
         this.scoreExterieur = scoreExterieur;
         this.championnatSaison = championnatSaison;
+        this.remoteId = remoteId;
     }
 
     public Long getId() {
@@ -109,5 +112,13 @@ public class Match {
 
     public void setChampionnatSaison(ChampionnatSaison championnatSaison) {
         this.championnatSaison = championnatSaison;
+    }
+
+    public Long getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(Long remoteId) {
+        this.remoteId = remoteId;
     }
 }

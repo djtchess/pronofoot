@@ -1,15 +1,28 @@
 <div class="matchday-wrapper" *ngIf="groupedByDate$ | async as grouped">
 
   <!-- Sélecteur de journée -->
-  <label>
-    Journée&nbsp;
-    <select
-      [ngModel]="selectedJournee()"
-      (ngModelChange)="onJourneeChange($event)"
-      class="journee-select">
-      <option *ngFor="let j of matchdays" [value]="j">{{ j }}</option>
-    </select>
-  </label>
+<label class="journee-label">
+  Journée&nbsp;
+  <select class="journee-select"
+          [ngModel]="selectedJournee()"
+          (ngModelChange)="onJourneeChange($event)">
+    <option *ngFor="let j of matchdays" [ngValue]="j">{{ j }}</option>
+  </select>
+</label>
+
+<!-- Boutons de mise à jour des scores -->
+<div class="match-actions">
+  <button class="btn-refresh-day"
+          (click)="refreshScoresJournee()"
+          [disabled]="matchdays.length === 0">
+    update scores
+  </button>
+
+  <button class="btn-refresh-all"
+          (click)="refreshScoresBeforeToday()">
+    update all scores
+  </button>
+</div>
 
   <!-- Matches de la journée, regroupés par date -->
   <ng-container *ngFor="let entry of grouped | keyvalue : sortByDate">
@@ -18,16 +31,13 @@
     <ul class="match-list">
       <li *ngFor="let m of entry.value" class="match-item">
 
-        <!-- heure -->
         <span class="time">{{ m.date | date : 'HH:mm' }}</span>
 
-        <!-- équipe domicile -->
         <span class="team home"
               [class.winner]="m.scoreDomicile > m.scoreExterieur">
           {{ m.equipeDomicile }}
         </span>
 
-        <!-- score (ou tiret avant coup d’envoi) -->
         <span class="score">
           <ng-container *ngIf="m.scoreDomicile !== null; else dash">
             {{ m.scoreDomicile }}-{{ m.scoreExterieur }}
@@ -35,15 +45,11 @@
           <ng-template #dash>–</ng-template>
         </span>
 
-        <!-- équipe extérieure -->
         <span class="team away"
               [class.winner]="m.scoreExterieur > m.scoreDomicile">
           {{ m.equipeExterieur }}
         </span>
       </li>
-
-
-
     </ul>
   </ng-container>
 </div>

@@ -118,3 +118,97 @@ label {
     padding: .6rem .8rem;
   }
 }
+
+/* ------------------------------------------------------------------
+   Boutons « actions scores » (matchday.component.scss par ex.)
+------------------------------------------------------------------- */
+.match-actions {
+  display: flex;            /* côte à côte */
+  gap: 1rem;                /* petit écart */
+  margin-block: 1rem;       /* espace vertical */
+}
+
+/* bouton bleu brillant */
+.btn-refresh-day {
+  background: transparent;      
+  color: #fff;
+  border: 1px solid rgba(232, 240, 255, .7);
+  padding: .5rem 1.25rem;
+  border-radius: .5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease;
+
+  &:hover   { background: #42a5ff; }
+  &:active  { transform: translateY(1px); }
+  &:disabled {
+    background: #96c8ff;
+    cursor: not-allowed;
+  }
+}
+
+/* bouton secondaire (contour) : reprend ta palette nuit */
+.btn-refresh-all {
+  background: transparent;
+  color: #e8f0ff;
+  border: 1px solid rgba(232, 240, 255, .7);
+  padding: .5rem 1.25rem;
+  border-radius: .5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, transform .15s ease;
+
+  &:hover   { background: #e8f0ff; color: #003566; }
+  &:active  { transform: translateY(1px); }
+}
+
+/* ------------------------------------------------------------------
+   Sélecteur de journée
+------------------------------------------------------------------- */
+.journee-label {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 600;
+  color: #e8f0ff;
+}
+
+/* aspect du <select> */
+.journee-select {
+  appearance: none;                         /* enlève l’UI native */
+  min-width: 5rem;
+  padding: .45rem 2.2rem .45rem .8rem;      /* place pour la flèche */
+  border-radius: .5rem;
+  font: 600 .9rem/1 'inherit';
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='%23e8f0ff'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23e8f0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      no-repeat right .7rem center,
+    rgba(232, 240, 255, .10);               /* fond translucide */
+  color: #e8f0ff;
+  border: 1px solid rgba(232, 240, 255, .45);
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+
+  &:hover {
+    background-color: rgba(232, 240, 255, .18);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: #7ec8ff;
+    box-shadow: 0 0 0 2px #7ec8ff;
+  }
+
+  /* élimine la flèche par défaut de Firefox */
+  &::-ms-expand,
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    display: none;
+  }
+}
+
+/* fond et texte des <option> lorsqu’ouverts (liste déroulante) */
+.journee-select option {
+  background: #001428;
+  color: #e8f0ff;
+}

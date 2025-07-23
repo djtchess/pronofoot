@@ -55,12 +55,16 @@ export class MatchService {
     return this.http.put<Match>(`${this.baseUrl}/${match.id}`, match);
   }
 
-  updateScoresJournee(code: string, journee: number): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/championnat/${code}/journees/${journee}/updateScores`, {});
+  /** MAJ des scores d’une journée précise */
+  updateScoresJournee(code: string,
+                      annee: string,
+                      journee: number) {
+    return this.http.post<void>(`${this.baseUrl}/championnat/${code}/saison/${annee}/journees/${journee}/updateScores`, {});
   }
 
-  updateScoresBeforeToday(code: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/championnat/${code}/updateScoresBeforeToday`, {});
+  /** MAJ de tous les scores manquants jusqu’à hier */
+  updateScoresBeforeToday(code: string, annee: string) {
+    return this.http.post<void>(`${this.baseUrl}/championnat/${code}/saison/${annee}/updateScoresBeforeToday`, {});
   }
 
 }

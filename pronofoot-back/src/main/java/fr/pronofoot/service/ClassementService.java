@@ -72,12 +72,11 @@ public class ClassementService {
         /* 5. Conversion + tri ------------------------------------------- */
         return table.entrySet().stream()
                 .map(e -> e.getValue().toDto(e.getKey()))
-                .sorted(
-                        Comparator.comparingInt(TeamStandingDto::points).reversed()
-                                .thenComparingInt(TeamStandingDto::goalDifference).reversed()
-                                .thenComparingInt(TeamStandingDto::butsPour).reversed()
-                                .thenComparing(TeamStandingDto::equipe)
-                )
+                .sorted(Comparator
+                        .comparingInt((TeamStandingDto s) -> -s.points())
+                        .thenComparingInt(s -> -s.goalDifference())
+                        .thenComparingInt(s -> -s.butsPour())
+                        .thenComparing(TeamStandingDto::equipe))
                 .collect(Collectors.toList());
     }
 

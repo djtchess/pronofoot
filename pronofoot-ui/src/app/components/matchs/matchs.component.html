@@ -1,42 +1,49 @@
 <div class="matchs-container">
-  <!-- Sélection du championnat -->
+
+  <!-- Sélection du championnat ----------------------------------->
   <label for="champ">Championnat :</label>
   <select id="champ"
           [(ngModel)]="selectedCode"
           (change)="onSelectChampionnat()">
-
     <option [ngValue]="null">-- Sélectionner --</option>
-
-    <!-- ⛔  (async ?? [])  -->
-    <!-- ✅  (async) || [] -->
     <option *ngFor="let c of (championnats$ | async) || []"
             [ngValue]="c.code">
       {{ c.nom }} ({{ c.code }})
     </option>
   </select>
 
+  <!-- Sélection de la saison ------------------------------------->
+  <ng-container *ngIf="saisons.length">
+    <label for="saison">Saison :</label>
+    <select id="saison"
+            class="season-select"
+            [(ngModel)]="selectedSeasonYear"
+            (change)="reloadMatches()">
+      <option *ngFor="let y of saisons" [ngValue]="y">{{ y }}</option>
+    </select>
+  </ng-container>
+
+  <!-- Bouton : tous les scores avant aujourd’hui -->
   <button (click)="updateScoresBeforeToday()"
-          [disabled]="!selectedCode">
-    Mettre à jour scores des journées passées
+          [disabled]="!selectedCode || !selectedSeasonYear">
+    Maj scores journées passées
   </button>
 
-  <!-- Groupes par journée -->
+  <!-- Groupés par journée ---------------------------------------->
   <ng-container *ngIf="data$ | async as groups">
     <div *ngFor="let g of groups" class="journee-card">
       <h3>Journée {{ g.journee }}</h3>
 
-      <button (click)="updateScoresJournee(g.journee)">
+      <button (click)="updateScoresJournee(g.journee)"
+              [disabled]="!selectedSeasonYear">
         Maj scores de cette journée
       </button>
 
       <table class="matchs-table">
         <thead>
           <tr>
-            <th>Domicile</th>
-            <th></th>
-            <th>Extérieur</th>
-            <th>Date</th>
-            <th>Score</th>
+            <th>Domicile</th><th></th><th>Extérieur</th>
+            <th>Date</th><th>Score</th>
           </tr>
         </thead>
         <tbody>
