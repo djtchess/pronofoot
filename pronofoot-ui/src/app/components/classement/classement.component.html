@@ -1,6 +1,19 @@
 <div class="classement-wrapper" *ngIf="classement$ | async as rows">
+<h2 class="title">
+  Classement <span class="subtitle">({{ classementLabel }})</span>
+</h2>
 
-  <h2 class="title">Classement</h2>
+  <div class="view-buttons">
+    <button (click)="changeView('global')">Général</button>
+    <button (click)="changeView('domicile')">Domicile</button>
+    <button (click)="changeView('exterieur')">Extérieur</button>
+    <button (click)="changeView('last5')">5 derniers</button>
+    <button (click)="changeView('last5Home')">5 domicile</button>
+    <button (click)="changeView('last5Away')">5 extérieur</button>
+    <button (click)="changeView('last10')">10 derniers</button>
+    <button (click)="changeView('last10Home')">10 domicile</button>
+    <button (click)="changeView('last10Away')">10 extérieur</button>
+  </div>
 
   <table>
     <thead>
@@ -24,5 +37,4 @@
       </tr>
     </tbody>
   </table>
-
 </div>
